@@ -1,0 +1,319 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-hls-black: #000000;
+  --color-hls-navy: #102030;
+  --color-hls-deep: #0c4373;
+  --color-hls-steel: #2b6ea3;
+  --color-hls-signal: #1273c2;
+  --color-hls-platinum: #e4e9ec;
+  --color-hls-slate: #6a6e70;
+  --color-hls-mist: #8c97a0;
+
+  --font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'General Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  --ease-expo: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ---------------------------------------------------------------
+   Base
+   --------------------------------------------------------------- */
+
+html {
+  background-color: #000000;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background-color: #000000;
+  color: #e4e9ec;
+  font-family: var(--font-body);
+  /* clip, not hidden. `hidden` turns body into a scroll container, which
+     silently disables position: sticky for everything inside it. */
+  overflow-x: clip;
+}
+
+::selection {
+  background-color: #1273c2;
+  color: #000000;
+}
+
+/* Lenis */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* Focus states, Signal Blue outline with offset */
+:focus-visible {
+  outline: 2px solid #1273c2;
+  outline-offset: 4px;
+  border-radius: 1px;
+}
+
+/* ---------------------------------------------------------------
+   Type primitives
+   --------------------------------------------------------------- */
+
+.kicker {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 1.2;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.meta {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 11px;
+  line-height: 1.8;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+}
+
+/* The vh term keeps long headlines off the nav on short laptop viewports.
+   On normal screens the vw term always wins. */
+.hero-headline {
+  font-size: clamp(44px, min(6vw, 15vh), 96px);
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(40px, 5vw, 80px);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.statement {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(36px, min(6vw, 12vh), 96px);
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+}
+
+.body-copy {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 1.6;
+  max-width: 640px;
+}
+
+@media (min-width: 768px) {
+  .body-copy {
+    font-size: 18px;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Reveal helpers, animated by GSAP. Pre-set here so nothing flashes
+   before the timeline is built.
+   --------------------------------------------------------------- */
+
+.js-mask {
+  clip-path: inset(0 0 105% 0);
+  will-change: clip-path;
+}
+
+.js-fade {
+  opacity: 0;
+}
+
+.js-rule {
+  transform: scaleX(0);
+  transform-origin: left center;
+  will-change: transform;
+}
+
+.js-word-inner {
+  display: inline-block;
+  transform: translateY(115%);
+  will-change: transform;
+}
+
+/* ---------------------------------------------------------------
+   Preloader
+   --------------------------------------------------------------- */
+
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #000000;
+}
+
+.preloader-crest {
+  opacity: 0;
+}
+
+/* ---------------------------------------------------------------
+   Section 07, circuit trace around the CTA on hover
+   --------------------------------------------------------------- */
+
+.cta-trace {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  transition: stroke-dashoffset 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.group:hover .cta-trace,
+.group:focus-visible .cta-trace {
+  stroke-dashoffset: 0;
+}
+
+/* ---------------------------------------------------------------
+   Cursor
+   --------------------------------------------------------------- */
+
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  border-radius: 9999px;
+  mix-blend-mode: normal;
+}
+
+.cursor-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #1273c2;
+  margin: -4px 0 0 -4px;
+}
+
+.cursor-ring {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #e4e9ec;
+  margin: -16px 0 0 -16px;
+  opacity: 0.45;
+}
+
+@media (hover: none), (pointer: coarse) {
+  .cursor-dot,
+  .cursor-ring {
+    display: none;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Reduced motion, content becomes static
+   --------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .js-mask {
+    clip-path: none !important;
+  }
+
+  .js-fade {
+    opacity: 1 !important;
+  }
+
+  .js-word-inner,
+  .js-rule {
+    transform: none !important;
+  }
+
+  .preloader-crest {
+    opacity: 1 !important;
+  }
+
+  .preloader {
+    display: none !important;
+  }
+
+  /* The three scroll-driven sections stage their content on top of itself.
+     With motion off that staging has to unfold into ordinary stacked
+     documents, otherwise copy overlaps or sits outside the viewport. */
+
+  .rm-flow {
+    position: static !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  .rm-stack {
+    display: block !important;
+    width: auto !important;
+    height: auto !important;
+    transform: none !important;
+  }
+
+  .rm-stack > * {
+    width: auto !important;
+    height: auto !important;
+    flex-shrink: 1 !important;
+  }
+
+  .rm-pad {
+    padding-top: 7rem !important;
+    padding-bottom: 7rem !important;
+  }
+
+  .rm-gap > * + * {
+    margin-top: 4rem !important;
+  }
+
+  /* Section 04 pairs a sticky illustration with scroll-driven crossfades.
+     With motion off it falls back to the stacked, image-per-block layout. */
+  .rm-hide {
+    display: none !important;
+  }
+
+  .rm-show {
+    display: block !important;
+  }
+
+  /* Section 04 crossfades two sentences in one grid cell. With motion off
+     they stack instead, so both stay readable. */
+  .shift-stack {
+    display: block !important;
+  }
+
+  .shift-stack > * + * {
+    margin-top: 0.35em;
+  }
+
+  .cursor-dot,
+  .cursor-ring {
+    display: none;
+  }
+}
