@@ -54,8 +54,13 @@ changes are needed.
 
 ## Storage
 
+`LEAD_STORE=google-sheets` keeps leads and bookings in a Google Sheet through an
+Apps Script web app. Use it on Vercel. Setup: `docs/google-sheets-setup.md`,
+script: `scripts/google-sheets/Code.gs`.
+
 `LEAD_STORE=local-json` writes `.data/book-store.json` (gitignored), with one
-lock per process. It is for development and a single-server preview only. Swap
+lock per process. It is for local development only and fails on Vercel, where
+the file system is read-only. Swap
 it for the chosen CRM or database by adding an adapter with the same methods
 (listed in `lib/book/store/index.js`). If a save fails, the lead goes to
 `.data/lead-fallback.ndjson` and is moved into the store on the next good save.
