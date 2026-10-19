@@ -4,9 +4,18 @@ import { Fragment, useEffect, useRef } from 'react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { initGsap, reducedMotion } from '@/lib/motion';
 
+/** Splits a sentence into the token shape `lines` expects. */
+export const toWords = (text, accent = false) =>
+  text.split(' ').map((word) => ({ text: word, accent }));
+
 /**
  * Headline reveal. Each word sits inside its own mask and rises into place.
  * `lines` is an array of arrays of tokens: { text, accent }.
+ * mode "manual" renders the masks only, a parent timeline drives the
+ * .js-word-inner children.
+ * `prerender` ships the words already risen, so the first paint contains
+ * them, and the effect drops them back before it plays. Only for copy that
+ * something covers until then, like the hero under the preloader.
  */
 export default function WordReveal({
   lines,
@@ -19,13 +28,14 @@ export default function WordReveal({
   delay = 0,
   mode = 'scroll',
   start = 'top 78%',
+  prerender = false,
 }) {
   const root = useRef(null);
 
   useEffect(() => {
     const gsap = initGsap();
     const el = root.current;
-    if (!el || reducedMotion()) return;
+    if (!el || mode === 'manual' || reducedMotion()) return;
 
     const words = el.querySelectorAll('.js-word-inner');
     // Stated explicitly, GSAP resolves the CSS percentage transform to pixels
@@ -60,7 +70,10 @@ export default function WordReveal({
           {tokens.map((t, ti) => (
             <Fragment key={ti}>
               <span className="inline-block overflow-hidden pb-[0.18em] mb-[-0.18em] align-bottom">
-                <span className={`js-word-inner ${t.accent ? accentClassName : ''}`}>
+                <span
+                  className={`js-word-inner ${t.accent ? accentClassName : ''}`}
+                  style={prerender ? { transform: 'none' } : undefined}
+                >
                   {t.text}
                 </span>
               </span>

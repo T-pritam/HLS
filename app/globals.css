@@ -10,9 +10,10 @@
   --color-hls-slate: #6a6e70;
   --color-hls-mist: #8c97a0;
 
-  --font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
-  --font-body: 'General Sans', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  /* The next/font variables sit on <html>, the same element as :root. */
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-body: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
 
   --ease-expo: cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -85,22 +86,35 @@ html.lenis body {
   text-transform: uppercase;
 }
 
+/* Fraunces picks its optical size from the font size, so the big lines get
+   the high-contrast display cut without asking for it. */
 .display {
   font-family: var(--font-display);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 0.95;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1;
 }
 
-/* The vh term keeps long headlines off the nav on short laptop viewports.
-   On normal screens the vw term always wins. */
+/* The vh term keeps the question off the nav on short laptop viewports. */
 .hero-headline {
-  font-size: clamp(44px, min(6vw, 15vh), 96px);
+  font-size: clamp(42px, min(6.8vw, 13vh), 116px);
+  line-height: 1.02;
+  text-wrap: balance;
+}
+
+/* One sentence holding the screen on its own. */
+.scene-line {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(34px, min(5.2vw, 9.5vh), 84px);
+  line-height: 1.06;
+  letter-spacing: -0.022em;
+  text-wrap: balance;
 }
 
 .section-title {
   font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 400;
   font-size: clamp(40px, 5vw, 80px);
   line-height: 1;
   letter-spacing: -0.02em;
@@ -108,7 +122,7 @@ html.lenis body {
 
 .statement {
   font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 400;
   font-size: clamp(36px, min(6vw, 12vh), 96px);
   line-height: 1.02;
   letter-spacing: -0.025em;
@@ -126,6 +140,14 @@ html.lenis body {
   .body-copy {
     font-size: 18px;
   }
+}
+
+/* Scenes below the fold skip style, layout and paint, and hold back their
+   lazy images, until they come near the viewport. Most are a fixed 100svh,
+   the estimate only matters for the close, which sizes to its content. */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 100svh;
 }
 
 /* ---------------------------------------------------------------
@@ -155,27 +177,296 @@ html.lenis body {
 }
 
 /* ---------------------------------------------------------------
-   Preloader
+   Preloader. Two black halves meet on the line the current draws,
+   then part along it.
    --------------------------------------------------------------- */
 
 .preloader {
   position: fixed;
   inset: 0;
   z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+}
+
+.preloader-half {
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* The extra pixel closes the seam on odd viewport heights. */
+  height: calc(50% + 1px);
   background-color: #000000;
 }
 
+.preloader-half-top {
+  top: 0;
+}
+
+.preloader-half-bottom {
+  bottom: 0;
+}
+
+.preloader-line {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 1px;
+  margin-top: -0.5px;
+  background-color: #1273c2;
+  box-shadow: 0 0 14px 1px rgba(18, 115, 194, 0.8);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
 .preloader-crest {
-  opacity: 0;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: -32px 0 0 -24px;
+}
+
+/* The crest fades in with CSS so it paints with the first frame, long before
+   the page's JavaScript arrives. It is the largest paint on load. The GSAP
+   timeline picks up from there and fades the wrapper out. */
+.preloader-crest img {
+  animation: crest-in 0.7s cubic-bezier(0.33, 1, 0.68, 1) both;
+}
+
+@keyframes crest-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* ---------------------------------------------------------------
-   Section 07, circuit trace around the CTA on hover
+   Scene 03, the five breaks. Without data-axis the nodes are a plain
+   stacked document, which is also the reduced motion layout. The
+   scene sets data-axis once it has built the camera.
    --------------------------------------------------------------- */
 
+.brk-node + .brk-node {
+  margin-top: 5rem;
+}
+
+.brk-num {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(88px, 14vw, 200px);
+  line-height: 0.84;
+  letter-spacing: -0.045em;
+}
+
+.brk-phrase {
+  margin-top: 1.25rem;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(30px, 3.6vw, 56px);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+}
+
+.brk-art {
+  position: relative;
+  width: min(70vw, 320px);
+  aspect-ratio: 1;
+  margin-top: 2rem;
+}
+
+.brk-outro {
+  margin-top: 6rem;
+}
+
+[data-axis] .brk-node {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+}
+
+[data-axis] .brk-num,
+[data-axis] .brk-phrase,
+[data-axis] .brk-art,
+[data-axis] .brk-counter,
+[data-axis] .brk-outro {
+  position: absolute;
+  margin: 0;
+}
+
+[data-axis] .brk-art {
+  aspect-ratio: auto;
+}
+
+/* Wide: the bus runs across at --bus-y, the break sits mid-screen. */
+[data-axis='x'] .brk-num {
+  right: calc(50% + 48px);
+  bottom: calc(100% - var(--bus-y) + 26px);
+  font-size: clamp(120px, min(17vw, 34vh), 300px);
+}
+
+[data-axis='x'] .brk-art {
+  left: calc(50% + 48px);
+  bottom: calc(100% - var(--bus-y) + 30px);
+  width: min(36vh, 26vw, 360px);
+  height: min(36vh, 26vw, 360px);
+}
+
+[data-axis='x'] .brk-phrase {
+  left: calc(50% + 48px);
+  top: calc(var(--bus-y) + 30px);
+  font-size: clamp(34px, 3.8vw, 64px);
+}
+
+[data-axis='x'] .brk-counter {
+  left: 40px;
+  bottom: 36px;
+}
+
+[data-axis='x'] .brk-outro {
+  left: 40px;
+  right: 40px;
+  top: calc(42% + 52px);
+  text-align: center;
+}
+
+/* Narrow: the bus runs down the left gutter at --bus-x. */
+[data-axis='y'] .brk-num {
+  left: calc(var(--bus-x) + 26px);
+  bottom: calc(50% + 34px);
+  font-size: clamp(88px, 27vw, 160px);
+}
+
+[data-axis='y'] .brk-phrase {
+  left: calc(var(--bus-x) + 26px);
+  right: 20px;
+  top: calc(50% - 0.56em);
+  font-size: clamp(30px, 8.4vw, 44px);
+}
+
+[data-axis='y'] .brk-art {
+  left: calc(var(--bus-x) + 26px);
+  top: calc(50% + 40px);
+  width: min(58vw, 30svh, 280px);
+  height: min(58vw, 30svh, 280px);
+}
+
+[data-axis='y'] .brk-counter {
+  right: 20px;
+  bottom: 24px;
+}
+
+[data-axis='y'] .brk-outro {
+  left: calc(var(--bus-x) + 26px);
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* ---------------------------------------------------------------
+   Scene 04, the single spark
+   --------------------------------------------------------------- */
+
+.spark {
+  position: relative;
+  width: 8px;
+  height: 8px;
+}
+
+.spark-core {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background-color: #e6f2fc;
+  box-shadow:
+    0 0 8px 2px rgba(150, 200, 240, 0.9),
+    0 0 22px 6px rgba(18, 115, 194, 0.7);
+}
+
+.spark-glow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 220px;
+  height: 220px;
+  margin: -110px 0 0 -110px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(18, 115, 194, 0.5) 0%, rgba(18, 115, 194, 0) 62%);
+}
+
+.spark-ray {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  background: linear-gradient(90deg, rgba(150, 200, 240, 0), #9ccbf0 50%, rgba(150, 200, 240, 0));
+}
+
+.spark-ray-h {
+  width: 240px;
+  height: 1px;
+  margin: -0.5px 0 0 -120px;
+}
+
+.spark-ray-v {
+  width: 1px;
+  height: 90px;
+  margin: -45px 0 0 -0.5px;
+  background: linear-gradient(180deg, rgba(150, 200, 240, 0), #9ccbf0 50%, rgba(150, 200, 240, 0));
+}
+
+/* ---------------------------------------------------------------
+   Scene 06, the closing loop. Each segment is a dim base line with a
+   lit line inside it that the timeline scales in.
+   --------------------------------------------------------------- */
+
+.loop-seg {
+  position: absolute;
+  background-color: rgba(18, 115, 194, 0.22);
+}
+
+.loop-seg > i {
+  position: absolute;
+  inset: 0;
+  background-color: #6aaee6;
+  box-shadow: 0 0 10px 1px rgba(18, 115, 194, 0.85);
+}
+
+.loop-node {
+  position: absolute;
+  bottom: 0;
+  width: 15px;
+  height: 15px;
+  margin: 0 0 -7px -7px;
+  border: 1px solid rgba(18, 115, 194, 0.5);
+  border-radius: 9999px;
+  background-color: #000000;
+}
+
+.loop-node > i {
+  position: absolute;
+  inset: 3px;
+  border-radius: 9999px;
+  background-color: #cfe5f8;
+  box-shadow:
+    0 0 6px 1px rgba(150, 200, 240, 0.9),
+    0 0 18px 4px rgba(18, 115, 194, 0.8);
+}
+
+.crest-glow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 280px;
+  height: 280px;
+  margin: -140px 0 0 -140px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(18, 115, 194, 0.55) 0%, rgba(18, 115, 194, 0) 62%);
+  pointer-events: none;
+}
+
+/* Circuit trace around the CTA on hover */
 .cta-trace {
   stroke-dasharray: 100;
   stroke-dashoffset: 100;
@@ -185,6 +476,23 @@ html.lenis body {
 .group:hover .cta-trace,
 .group:focus-visible .cta-trace {
   stroke-dashoffset: 0;
+}
+
+/* ---------------------------------------------------------------
+   Ribbon between the breaks and the turn
+   --------------------------------------------------------------- */
+
+.ribbon-track {
+  animation: ribbon 38s linear infinite;
+}
+
+@keyframes ribbon {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 /* ---------------------------------------------------------------
@@ -259,9 +567,14 @@ html.lenis body {
     display: none !important;
   }
 
-  /* The three scroll-driven sections stage their content on top of itself.
-     With motion off that staging has to unfold into ordinary stacked
-     documents, otherwise copy overlaps or sits outside the viewport. */
+  /* The ribbon holds still at its first frame rather than its last. */
+  .ribbon-track {
+    animation: none !important;
+  }
+
+  /* The pinned scenes stage their content on top of itself. With motion
+     off that staging has to unfold into ordinary stacked documents,
+     otherwise copy overlaps or sits outside the viewport. */
 
   .rm-flow {
     position: static !important;
@@ -292,8 +605,6 @@ html.lenis body {
     margin-top: 4rem !important;
   }
 
-  /* Section 04 pairs a sticky illustration with scroll-driven crossfades.
-     With motion off it falls back to the stacked, image-per-block layout. */
   .rm-hide {
     display: none !important;
   }
@@ -302,13 +613,15 @@ html.lenis body {
     display: block !important;
   }
 
-  /* Section 04 crossfades two sentences in one grid cell. With motion off
-     they stack instead, so both stay readable. */
-  .shift-stack {
+  /* Two sentences that crossfade in one grid cell stack instead, so both
+     stay readable. v1 Section 04 calls this shift-stack. */
+  .shift-stack,
+  .rm-unstack {
     display: block !important;
   }
 
-  .shift-stack > * + * {
+  .shift-stack > * + *,
+  .rm-unstack > * + * {
     margin-top: 0.35em;
   }
 

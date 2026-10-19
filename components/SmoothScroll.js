@@ -48,6 +48,8 @@ export default function SmoothScroll() {
 
     const refresh = () => ScrollTrigger.refresh();
     window.addEventListener('load', refresh);
+    // Swapped-in webfonts reflow the copy that unpinned triggers measure.
+    document.fonts?.ready.then(refresh);
     ScrollTrigger.refresh();
 
     return () => {

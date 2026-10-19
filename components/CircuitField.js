@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { buildCircuit } from '@/lib/circuit';
-import { initGsap, reducedMotion } from '@/lib/motion';
+import { afterFirstInput, initGsap, reducedMotion } from '@/lib/motion';
 
 /**
  * Network of nodes joined by orthogonal Signal Blue traces. Lines draw
@@ -41,56 +41,68 @@ export default function CircuitField({
     const el = svg.current;
     if (!el || reducedMotion()) return;
 
-    const lines = Array.from(el.querySelectorAll('path'));
-    const dots = Array.from(el.querySelectorAll('circle'));
-
-    lines.forEach((p) => {
-      const len = p.getTotalLength();
-      p.style.strokeDasharray = `${len}`;
-      p.style.strokeDashoffset = `${len}`;
-    });
-    gsap.set(dots, { opacity: 0 });
-
-    const tl = gsap.timeline({
-      paused: true,
-      delay,
-    });
-
-    tl.to(lines, {
-      strokeDashoffset: 0,
-      duration: duration * 0.6,
-      ease: 'none',
-      stagger: { amount: duration * 0.4, from: 'start' },
-    }).to(
-      dots,
-      {
-        opacity: 1,
-        duration: duration * 0.3,
-        ease: 'expo.out',
-        stagger: { amount: duration * 0.4, from: 'start' },
-      },
-      duration * 0.22
-    );
-
-    timeline.current = tl;
-
+    let tl;
     let st;
-    if (mode === 'scroll') {
-      st = ScrollTrigger.create({
-        trigger: el,
-        start: 'top 88%',
-        once: true,
-        onEnter: () => tl.play(0),
+    const setup = () => {
+      const lines = Array.from(el.querySelectorAll('path'));
+      const dots = Array.from(el.querySelectorAll('circle'));
+
+      // Measure every path before styling any of them. Interleaving the two
+      // forces a style recalc per path.
+      const lengths = lines.map((p) => p.getTotalLength());
+      lines.forEach((p, i) => {
+        p.style.strokeDasharray = `${lengths[i]}`;
+        p.style.strokeDashoffset = `${lengths[i]}`;
       });
-    } else if (mode === 'load') {
-      tl.play(0);
-    } else if (active) {
-      tl.play(0);
-    }
+      gsap.set(dots, { opacity: 0 });
+
+      tl = gsap.timeline({
+        paused: true,
+        delay,
+      });
+
+      tl.to(lines, {
+        strokeDashoffset: 0,
+        duration: duration * 0.6,
+        ease: 'none',
+        stagger: { amount: duration * 0.4, from: 'start' },
+      }).to(
+        dots,
+        {
+          opacity: 1,
+          duration: duration * 0.3,
+          ease: 'expo.out',
+          stagger: { amount: duration * 0.4, from: 'start' },
+        },
+        duration * 0.22
+      );
+
+      timeline.current = tl;
+
+      if (mode === 'scroll') {
+        st = ScrollTrigger.create({
+          trigger: el,
+          start: 'top 88%',
+          once: true,
+          onEnter: () => tl.play(0),
+        });
+      } else if (mode === 'load') {
+        tl.play(0);
+      } else if (active) {
+        tl.play(0);
+      }
+    };
+
+    // A field that waits for scroll is below the fold, it can wait for the
+    // visitor's first input too. The scenes it sits in build first.
+    let cancel = () => {};
+    if (mode === 'scroll') cancel = afterFirstInput(0, setup);
+    else setup();
 
     return () => {
+      cancel();
       st?.kill();
-      tl.kill();
+      tl?.kill();
       timeline.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
