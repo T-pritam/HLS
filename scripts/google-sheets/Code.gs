@@ -1,9 +1,11 @@
 /**
  * HLS /book lead store: Google Apps Script web app for a Google Sheet.
  *
- * Paste this into Extensions → Apps Script of the leads spreadsheet, set the
- * script property BOOK_SHEETS_SECRET, run setup() once, then deploy as a web
- * app (Execute as: Me, Who has access: Anyone). Full steps:
+ * Paste this into Extensions → Apps Script of the leads spreadsheet (or set the
+ * script property SPREADSHEET_ID if the script is standalone), set the script
+ * property BOOK_SHEETS_SECRET, run setup() once, then deploy as a web app
+ * (Execute as: Me, Who has access: Anyone). The sheets can also come from the
+ * template file hls-book-leads-template.xlsx. Full steps:
  * docs/google-sheets-setup.md in the website repo.
  *
  * Sheets it manages:
@@ -119,41 +121,64 @@ function out_(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
 }
 
-/** Run once from the editor to create the sheets. Safe to run again. */
+/**
+ * Run once from the editor (choose "setup", then Run). Creates or checks the
+ * sheets and writes a short report to the execution log. Safe to run again.
+ */
 function setup() {
   setup_();
+  var hasSecret = Boolean(PropertiesService.getScriptProperties().getProperty('BOOK_SHEETS_SECRET'));
+  Logger.log('Sheets ready in "' + ss_().getName() + '".');
+  Logger.log(hasSecret ? 'BOOK_SHEETS_SECRET is set.' : 'BOOK_SHEETS_SECRET is NOT set yet: add it under Project Settings → Script properties.');
+}
+
+/** The leads spreadsheet: the one this script is attached to, or SPREADSHEET_ID. */
+function ss_() {
+  var id = PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID');
+  var ss = id ? SpreadsheetApp.openById(id) : SpreadsheetApp.getActive();
+  if (!ss) {
+    throw new Error('No spreadsheet. Open the script from the sheet (Extensions → Apps Script), or set the script property SPREADSHEET_ID.');
+  }
+  return ss;
+}
+
+/** New sheets have 1000 rows and 26 columns; grow them before writing past that. */
+function ensureSize_(sheet, rows, cols) {
+  var maxRows = sheet.getMaxRows();
+  if (rows > maxRows) sheet.insertRowsAfter(maxRows, rows - maxRows);
+  var maxCols = sheet.getMaxColumns();
+  if (cols > maxCols) sheet.insertColumnsAfter(maxCols, cols - maxCols);
+}
+
+/** Creates any missing sheet and header (also fixes sheets made from the template or a CSV). */
+function sheet_(ss, name, header, hide) {
+  var sheet = ss.getSheetByName(name);
+  var created = !sheet;
+  if (created) sheet = ss.insertSheet(name);
+  ensureSize_(sheet, 2, header.length);
+  var first = sheet.getRange(1, 1, 1, header.length).getValues()[0];
+  if (String(first[0]) !== String(header[0])) {
+    sheet.getRange(1, 1, 1, header.length).setValues([header]).setFontWeight('bold');
+    sheet.setFrozenRows(1);
+  }
+  if (created) {
+    if (name !== META) sheet.getRange(1, 1, sheet.getMaxRows(), header.length).setNumberFormat('@');
+    if (hide) sheet.hideSheet();
+  }
+  return sheet;
 }
 
 function setup_() {
-  var ss = SpreadsheetApp.getActive();
-  var leads = ss.getSheetByName(LEADS);
-  if (!leads) {
-    leads = ss.insertSheet(LEADS);
-    leads.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]).setFontWeight('bold');
-    leads.setFrozenRows(1);
-    leads.getRange(1, 1, leads.getMaxRows(), HEADERS.length).setNumberFormat('@');
-    leads.hideColumns(JSON_COL + 1);
-  }
-  if (!ss.getSheetByName(INDEX)) {
-    var idx = ss.insertSheet(INDEX);
-    idx.getRange(1, 1, 1, 3).setValues([['type', 'key', 'value']]).setFontWeight('bold');
-    idx.getRange(1, 1, idx.getMaxRows(), 3).setNumberFormat('@');
-    idx.hideSheet();
-  }
-  if (!ss.getSheetByName(META)) {
-    var meta = ss.insertSheet(META);
-    meta.getRange(1, 1, 1, 2).setValues([['version', 0]]);
-    meta.hideSheet();
-  }
-  if (!ss.getSheetByName(FALLBACK)) {
-    var fb = ss.insertSheet(FALLBACK);
-    fb.getRange(1, 1, 1, 3).setValues([['fid', 'at', 'record_json']]).setFontWeight('bold');
-    fb.getRange(1, 1, fb.getMaxRows(), 3).setNumberFormat('@');
-  }
+  var ss = ss_();
+  var leads = sheet_(ss, LEADS, HEADERS, false);
+  if (!leads.isColumnHiddenByUser(JSON_COL + 1)) leads.hideColumns(JSON_COL + 1);
+  sheet_(ss, INDEX, ['type', 'key', 'value'], true);
+  sheet_(ss, META, ['version', 0], true);
+  sheet_(ss, FALLBACK, ['fid', 'at', 'record_json'], false);
 }
 
 function version_() {
-  return Number(SpreadsheetApp.getActive().getSheetByName(META).getRange(1, 2).getValue()) || 0;
+  return Number(ss_().getSheetByName(META).getRange(1, 2).getValue()) || 0;
 }
 
 function rows_(sheet, width) {
@@ -171,7 +196,7 @@ function cell_(v) {
 /* ------------------------------------------------------------------ */
 
 function load_(req) {
-  var ss = SpreadsheetApp.getActive();
+  var ss = ss_();
   var index = rows_(ss.getSheetByName(INDEX), 3).filter(function (r) { return r[0]; });
   var want = req.leadIds;
   var leads = [];
@@ -203,7 +228,7 @@ function load_(req) {
 }
 
 function commit_(req) {
-  var ss = SpreadsheetApp.getActive();
+  var ss = ss_();
   var current = version_();
   if (Number(req.version) !== current) return { ok: false, conflict: true, version: current };
 
@@ -219,7 +244,9 @@ function commit_(req) {
     else appends.push(row);
   });
   if (appends.length) {
-    sheet.getRange(sheet.getLastRow() + 1, 1, appends.length, HEADERS.length).setNumberFormat('@').setValues(appends);
+    var start = sheet.getLastRow() + 1;
+    ensureSize_(sheet, start + appends.length - 1, HEADERS.length);
+    sheet.getRange(start, 1, appends.length, HEADERS.length).setNumberFormat('@').setValues(appends);
   }
 
   // Index: apply sets and deletes, then rewrite the sheet.
@@ -244,7 +271,10 @@ function commit_(req) {
   });
   var last = idxSheet.getLastRow();
   if (last > 1) idxSheet.getRange(2, 1, last - 1, 3).clearContent();
-  if (data.length) idxSheet.getRange(2, 1, data.length, 3).setNumberFormat('@').setValues(data);
+  if (data.length) {
+    ensureSize_(idxSheet, data.length + 1, 3);
+    idxSheet.getRange(2, 1, data.length, 3).setNumberFormat('@').setValues(data);
+  }
 
   ss.getSheetByName(META).getRange(1, 2).setValue(current + 1);
   SpreadsheetApp.flush();
@@ -254,13 +284,13 @@ function commit_(req) {
 /* ------------------------------------------------------------------ */
 
 function fallback_(req) {
-  var sheet = SpreadsheetApp.getActive().getSheetByName(FALLBACK);
+  var sheet = ss_().getSheetByName(FALLBACK);
   sheet.appendRow([req.fid, new Date().toISOString(), JSON.stringify(req.record)]);
   return { ok: true };
 }
 
 function readFallback_() {
-  var records = rows_(SpreadsheetApp.getActive().getSheetByName(FALLBACK), 3)
+  var records = rows_(ss_().getSheetByName(FALLBACK), 3)
     .filter(function (r) { return r[0]; })
     .map(function (r) {
       var record = null;
@@ -271,7 +301,7 @@ function readFallback_() {
 }
 
 function clearFallback_(req) {
-  var sheet = SpreadsheetApp.getActive().getSheetByName(FALLBACK);
+  var sheet = ss_().getSheetByName(FALLBACK);
   var done = {};
   (req.fids || []).forEach(function (f) { done[f] = true; });
   var keep = rows_(sheet, 3).filter(function (r) { return r[0] && !done[r[0]]; });
