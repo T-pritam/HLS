@@ -54,9 +54,14 @@ changes are needed.
 
 ## Storage
 
-`LEAD_STORE=google-sheets` keeps leads and bookings in a Google Sheet through an
-Apps Script web app. Use it on Vercel. Setup: `docs/google-sheets-setup.md`,
-script: `scripts/google-sheets/Code.gs`.
+`LEAD_STORE=redis` (Upstash) keeps bookings in Redis: each call takes
+milliseconds, and it is safe across serverless instances. Use it on Vercel. With
+`BOOK_SHEETS_URL` set, every lead is also copied to the Google Sheet in the
+background. Setup: `docs/lead-storage-setup.md`.
+
+`LEAD_STORE=google-sheets` uses the sheet alone as the store (Apps Script web
+app). It works but is slow, about a second per call. Setup:
+`docs/google-sheets-setup.md`, script: `scripts/google-sheets/Code.gs`.
 
 `LEAD_STORE=local-json` writes `.data/book-store.json` (gitignored), with one
 lock per process. It is for local development only and fails on Vercel, where
@@ -73,6 +78,8 @@ With `BOOK_ADMIN_TOKEN` set (send it as `Authorization: Bearer …`):
 - `PATCH /api/book/admin/leads` `{ leadId, status, owner, nextAction, note }`.
   Statuses: New, Booked, Attended, Blueprint delivered, In counselling, Enrolled, Refunded, Closed.
 - `POST /api/book/admin/refund` `{ leadId, reason }`: full refund
+- `POST /api/book/admin/sync-sheet`: copies every lead to the Google Sheet again
+  (repair after a Sheets outage).
 - `POST /api/book/admin/reconcile`: asks Razorpay about every open unpaid order
   and books any that were paid. A backstop for missed webhooks; safe to run on a schedule.
 

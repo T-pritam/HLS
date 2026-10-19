@@ -3,7 +3,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { Inr, telHref, whatsappHref } from './format';
 
-const POLL_MS = 2000;
+// Quick checks at first (the payment usually lands within seconds), then slower.
+const POLL_FAST_MS = 1000;
+const POLL_MS = 2500;
 const PATIENCE_MS = 90000;
 
 function SupportLine({ contact }) {
@@ -96,7 +98,7 @@ export default function Confirmation({ leadId, token, durationMin, contact }) {
         // Network blip: keep polling.
       }
       if (Date.now() - started.current > PATIENCE_MS) setWaitedLong(true);
-      timer = setTimeout(poll, POLL_MS);
+      timer = setTimeout(poll, Date.now() - started.current < 15000 ? POLL_FAST_MS : POLL_MS);
     };
     poll();
     return () => {

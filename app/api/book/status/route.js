@@ -12,8 +12,8 @@ export async function GET(request) {
   const leadId = url.searchParams.get('leadId') ?? '';
   const token = url.searchParams.get('token') ?? '';
   if (!leadId || !checkToken(leadId, token)) return json({ error: 'Not found.' }, 404);
-  await reconcile(leadId);
-  const lead = await getLead(leadId);
+  let lead = await getLead(leadId);
   if (!lead) return json({ error: 'Not found.' }, 404);
+  lead = (await reconcile(leadId, { lead })) ?? lead;
   return json({ status: publicStatus(lead) });
 }

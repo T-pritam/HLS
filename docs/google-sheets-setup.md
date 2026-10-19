@@ -1,5 +1,9 @@
 # Store /book leads in Google Sheets
 
+> **Recommended:** keep bookings in Redis and use this sheet as a background
+> copy: see [lead-storage-setup.md](lead-storage-setup.md). The steps below
+> still create the sheet and its script; only the Vercel settings differ.
+
 For now, leads and bookings are stored in a Google Sheet. The website can't
 write to a Google Sheet on its own, so a small Apps Script web app inside the
 sheet receives the writes. This works on Vercel; the default local store does

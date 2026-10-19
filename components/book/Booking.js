@@ -70,16 +70,24 @@ const timeFmt = (iso) =>
     .format(new Date(iso))
     .toUpperCase();
 
+let razorpayScript = null;
+
+/** Loads Razorpay Checkout once. Called early (on the time step) so Pay opens at once. */
 function loadRazorpay() {
   if (window.Razorpay) return Promise.resolve(true);
-  return new Promise((resolve) => {
+  if (razorpayScript) return razorpayScript;
+  razorpayScript = new Promise((resolve) => {
     const s = document.createElement('script');
     s.src = 'https://checkout.razorpay.com/v1/checkout.js';
     s.async = true;
     s.onload = () => resolve(true);
-    s.onerror = () => resolve(false);
+    s.onerror = () => {
+      razorpayScript = null;
+      resolve(false);
+    };
     document.body.appendChild(s);
   });
+  return razorpayScript;
 }
 
 /* ------------------------------------------------------------------ */
@@ -175,11 +183,15 @@ export default function Booking({ variant, priceInr, taxLabel, paymentMode, slot
   const [busy, setBusy] = useState(false);
   const [slots, setSlots] = useState(null);
   const [mockOpen, setMockOpen] = useState(false);
+  // 'open' while Razorpay's window is up, 'received' once it reports success.
+  const [checkout, setCheckout] = useState(null);
   const requestId = useRef(null);
   const source = useRef({});
   const fault = useRef(null);
   const titleRef = useRef(null);
   const payLock = useRef(false);
+  // The order is created in the background as soon as a time is held.
+  const prefetched = useRef(null);
   const mockDialog = useRef(null);
 
   const go = useCallback((next) => {
@@ -321,24 +333,40 @@ export default function Booking({ variant, priceInr, taxLabel, paymentMode, slot
         return;
       }
       setStatus(res.data.status);
+      if (res.data.status?.paymentRequired !== false) {
+        prefetched.current = api('/api/book/order', { body: lead, fault: fault.current }).catch(() => null);
+      }
     } finally {
       setBusy(false);
     }
   }
 
+  // Fetch Razorpay's script while the student picks a time.
+  useEffect(() => {
+    if (step === 'slot' && paymentMode !== 'mock') loadRazorpay();
+  }, [step, paymentMode]);
+
   const held = status?.hold && Date.parse(status.hold.expiresAt) > Date.now() ? status.hold : null;
 
   async function cancelled(reason, text) {
+    prefetched.current = null;
     const res = await api('/api/book/hold', { method: 'DELETE', body: { ...lead, reason } });
     if (res.ok) setStatus(res.data.status);
     setNotice({ kind: 'info', text });
     loadSlots(lead);
   }
 
-  async function paid(resp) {
-    // Checks the signature server-side; the confirmation page then waits for
-    // Razorpay's webhook to mark the booking paid.
-    await api('/api/book/verify', { body: { ...lead, ...resp } }).catch(() => null);
+  function paid(resp) {
+    // Show it at once, send the signature for the server to check (keepalive
+    // lets it finish while the page changes), and move on. The confirmation
+    // page shows the booking as soon as the server has Razorpay's word for it.
+    setCheckout('received');
+    fetch('/api/book/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...lead, ...resp }),
+      keepalive: true,
+    }).catch(() => null);
     window.location.assign(confirmationUrl(lead));
   }
 
@@ -348,7 +376,13 @@ export default function Booking({ variant, priceInr, taxLabel, paymentMode, slot
     setBusy(true);
     setNotice(null);
     try {
-      const res = await api('/api/book/order', { body: lead, fault: fault.current });
+      // Use the order made in the background when the time was held, if the
+      // hold still has a minute left; otherwise ask for it now.
+      const pending = prefetched.current;
+      prefetched.current = null;
+      const fresh = held && Date.parse(held.expiresAt) - Date.now() > 60000;
+      let res = pending && fresh ? await pending : null;
+      if (!res?.ok || !res.data?.order) res = await api('/api/book/order', { body: lead, fault: fault.current });
       if (res.data.alreadyBooked || res.data.noPayment) {
         window.location.assign(confirmationUrl(lead));
         return;
@@ -383,8 +417,10 @@ export default function Booking({ variant, priceInr, taxLabel, paymentMode, slot
         theme: { color: '#1273c2' },
         handler: paid,
         modal: {
-          ondismiss: () =>
-            cancelled('cancelled', 'Payment cancelled. Your slot has been released. Choose a time to try again.'),
+          ondismiss: () => {
+            setCheckout(null);
+            cancelled('cancelled', 'Payment cancelled. Your slot has been released. Choose a time to try again.');
+          },
           confirm_close: true,
         },
       });
@@ -394,6 +430,7 @@ export default function Booking({ variant, priceInr, taxLabel, paymentMode, slot
           text: `The payment did not go through${r?.error?.description ? `: ${r.error.description.replace(/[.\s]+$/, '')}` : ''}. You can try again in the payment window.`,
         });
       });
+      setCheckout('open');
       rzp.open();
     } catch {
       setNotice({ kind: 'error', text: 'We could not start the payment.', fallback: true });
@@ -677,7 +714,20 @@ export default function Booking({ variant, priceInr, taxLabel, paymentMode, slot
           )}
 
           <div className="mt-8">
-            {status?.paymentRequired === false ? (
+            {checkout ? (
+              <div className="rounded-md border-l-4 border-hls-signal bg-[#eef5fb] p-4" role="status" aria-live="polite">
+                <p className="font-medium text-hls-navy">
+                  {checkout === 'received'
+                    ? 'Payment received. Confirming your booking…'
+                    : 'Finish paying in the Razorpay window.'}
+                </p>
+                <p className="mt-1 text-[15px] text-hls-muted">
+                  {checkout === 'received'
+                    ? 'This takes a moment. Please keep this page open.'
+                    : 'This page updates by itself when the payment is done. Please don’t pay twice.'}
+                </p>
+              </div>
+            ) : status?.paymentRequired === false ? (
               <button type="button" className="btn-primary w-full sm:w-auto" disabled={!held || busy} onClick={pay}>
                 Confirm booking
               </button>

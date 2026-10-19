@@ -14,8 +14,14 @@
  *   _meta     a version number, so two writes can never overwrite each other
  *   Fallback  leads parked when a normal save failed; moved into Leads later
  *
- * You may edit these Leads columns by hand: Status, Owner, Next action,
- * Staff notes. Do not edit other columns, record_json or the _index/_meta sheets.
+ * Two ways the site uses it:
+ *   LEAD_STORE=redis (recommended): the site keeps bookings in Redis and only
+ *     copies leads here in the background ("mirror"). Staff may edit Owner and
+ *     Staff notes; a Status you set past Booked (Attended, Blueprint delivered,
+ *     In counselling, Enrolled, Closed) is kept unless the lead is refunded.
+ *   LEAD_STORE=google-sheets: this sheet is the store itself. Staff may edit
+ *     Status, Owner, Next action and Staff notes.
+ * Do not edit other columns, record_json or the _index/_meta sheets.
  */
 
 var LEADS = 'Leads';
@@ -78,6 +84,8 @@ var COLUMNS = [
 ];
 var HEADERS = COLUMNS.map(function (c) { return c[0]; });
 var JSON_COL = HEADERS.length - 1;
+// Statuses only staff set; the mirror keeps them unless the lead is refunded.
+var STAFF_STATUSES = ['Attended', 'Blueprint delivered', 'In counselling', 'Enrolled', 'Closed'];
 // Columns staff may edit in the sheet, and the record field each one sets.
 var EDITABLE = { 'Status': 'status', 'Owner': 'owner', 'Next action': 'nextAction', 'Staff notes': 'staffNotes' };
 
@@ -100,9 +108,10 @@ function doPost(e) {
   var lock = LockService.getScriptLock();
   if (!lock.tryLock(25000)) return out_({ ok: false, error: 'busy' });
   try {
-    setup_();
+    ensureSetup_();
     switch (req.action) {
       case 'ping': return out_({ ok: true, version: version_() });
+      case 'mirror': return out_(mirror_(req));
       case 'load': return out_(load_(req));
       case 'commit': return out_(commit_(req));
       case 'fallback': return out_(fallback_(req));
@@ -168,6 +177,14 @@ function sheet_(ss, name, header, hide) {
   return sheet;
 }
 
+/** setup_ touches many ranges; once it has run, skip it for six hours. */
+function ensureSetup_() {
+  var cache = CacheService.getScriptCache();
+  if (cache.get('book_setup_ok')) return;
+  setup_();
+  cache.put('book_setup_ok', '1', 21600);
+}
+
 function setup_() {
   var ss = ss_();
   var leads = sheet_(ss, LEADS, HEADERS, false);
@@ -201,10 +218,19 @@ function load_(req) {
   var want = req.leadIds;
   var leads = [];
   if (want === 'all' || (want && want.length)) {
-    var set = {};
-    if (want !== 'all') want.forEach(function (id) { set[id] = true; });
-    rows_(ss.getSheetByName(LEADS), HEADERS.length).forEach(function (row) {
-      if (!row[0] || (want !== 'all' && !set[row[0]])) return;
+    var leadSheet = ss.getSheetByName(LEADS);
+    var rows;
+    if (want === 'all') {
+      rows = rows_(leadSheet, HEADERS.length);
+    } else {
+      rows = [];
+      want.forEach(function (id) {
+        var at = findRow_(leadSheet, id);
+        if (at) rows.push(leadSheet.getRange(at, 1, 1, HEADERS.length).getValues()[0]);
+      });
+    }
+    rows.forEach(function (row) {
+      if (!row[0]) return;
       var lead;
       try {
         lead = JSON.parse(row[JSON_COL]);
@@ -227,6 +253,50 @@ function load_(req) {
   return { ok: true, version: version_(), leads: leads, index: index };
 }
 
+/** Row number of a Lead ID in column A, or 0. */
+function findRow_(sheet, id) {
+  if (!id || sheet.getLastRow() < 2) return 0;
+  var hit = sheet.getRange(2, 1, sheet.getLastRow() - 1, 1).createTextFinder(String(id)).matchEntireCell(true).findNext();
+  return hit ? hit.getRow() : 0;
+}
+
+/**
+ * Background copy from the site (LEAD_STORE=redis): insert or update lead rows.
+ * An older copy never overwrites a newer one. Owner and Staff notes belong to
+ * staff and are never overwritten.
+ */
+function mirror_(req) {
+  var sheet = ss_().getSheetByName(LEADS);
+  var owner = HEADERS.indexOf('Owner');
+  var notes = HEADERS.indexOf('Staff notes');
+  var status = HEADERS.indexOf('Status');
+  var appends = [];
+  (req.leads || []).forEach(function (lead) {
+    if (!lead || !lead.id) return;
+    var row = COLUMNS.map(function (c) { return cell_(c[1](lead)); });
+    row[JSON_COL] = JSON.stringify(lead);
+    var at = findRow_(sheet, lead.id);
+    if (!at) {
+      appends.push(row);
+      return;
+    }
+    var current = sheet.getRange(at, 1, 1, HEADERS.length).getValues()[0];
+    var stored = {};
+    try { stored = JSON.parse(current[JSON_COL]); } catch (err) {}
+    if (stored.updatedAt && lead.updatedAt && stored.updatedAt > lead.updatedAt) return;
+    row[owner] = cell_(current[owner]);
+    row[notes] = cell_(current[notes]);
+    if (STAFF_STATUSES.indexOf(String(current[status])) >= 0 && lead.status !== 'Refunded') row[status] = current[status];
+    sheet.getRange(at, 1, 1, HEADERS.length).setValues([row]);
+  });
+  if (appends.length) {
+    var start = sheet.getLastRow() + 1;
+    ensureSize_(sheet, start + appends.length - 1, HEADERS.length);
+    sheet.getRange(start, 1, appends.length, HEADERS.length).setNumberFormat('@').setValues(appends);
+  }
+  return { ok: true, written: (req.leads || []).length };
+}
+
 function commit_(req) {
   var ss = ss_();
   var current = version_();
@@ -234,13 +304,12 @@ function commit_(req) {
 
   // Leads: update the row with the same Lead ID, or append.
   var sheet = ss.getSheetByName(LEADS);
-  var ids = rows_(sheet, 1).map(function (r) { return r[0]; });
   var appends = [];
   (req.leads || []).forEach(function (lead) {
     var row = COLUMNS.map(function (c) { return cell_(c[1](lead)); });
     row[JSON_COL] = JSON.stringify(lead);
-    var at = ids.indexOf(lead.id);
-    if (at >= 0) sheet.getRange(at + 2, 1, 1, row.length).setValues([row]);
+    var at = findRow_(sheet, lead.id);
+    if (at) sheet.getRange(at, 1, 1, row.length).setValues([row]);
     else appends.push(row);
   });
   if (appends.length) {
