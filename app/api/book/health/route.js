@@ -29,7 +29,9 @@ export async function GET(request) {
     functionRegion: process.env.VERCEL_REGION ?? 'local',
     paymentMode: cfg.payment.mode,
     paymentsReady: cfg.payment.ready,
+    testHooks: cfg.testHooks,
   };
+  if (cfg.testHooks && process.env.VERCEL) body.warning = 'BOOK_TEST_HOOKS is on; set it to false on the live site.';
   if (cfg.leadStore === 'redis' && !body.redisConfigured) body.warning = 'LEAD_STORE=redis but no Upstash URL/token is set.';
   if (cfg.leadStore === 'local-json' && process.env.VERCEL) body.warning = 'local-json cannot save on Vercel; set LEAD_STORE=redis.';
   if (cfg.leadStore === 'google-sheets') body.warning = 'Google Sheets as the store is slow; set LEAD_STORE=redis.';
