@@ -8,8 +8,8 @@ export const dynamic = 'force-dynamic';
 async function timed(fn) {
   const t = Date.now();
   try {
-    await fn();
-    return { ok: true, ms: Date.now() - t };
+    const extra = await fn();
+    return { ok: true, ms: Date.now() - t, ...(extra && typeof extra === 'object' ? extra : {}) };
   } catch (err) {
     return { ok: false, ms: Date.now() - t, error: err.message };
   }
@@ -49,7 +49,10 @@ export async function GET(request) {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
       });
     }
-    if (body.sheetsConfigured) body.probe.sheets = await timed(() => callSheets('ping'));
+    if (body.sheetsConfigured) {
+      // The sheet's change counter: tells two deployments/sheets apart without revealing the URL.
+      body.probe.sheets = await timed(async () => ({ sheetVersion: (await callSheets('ping')).version }));
+    }
   }
   return json(body);
 }
