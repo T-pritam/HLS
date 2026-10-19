@@ -35,6 +35,12 @@ records `variant: "a"` and `variantRequested: "b"`.
 
 ## Payments
 
+Testing currently uses Tach's Razorpay test account while HLS's own account is
+under review, so checkout shows Tach's name and logo. When HLS's account is
+approved, replace the keys and webhook secret in `.env.local`, register the
+webhook on that account, and re-run one test payment and one refund. No code
+changes are needed.
+
 - `RAZORPAY_MODE=test` with `rzp_test_` keys. Live keys are refused.
 - `RAZORPAY_MODE=mock` (plus `BOOK_TEST_HOOKS=true`) runs a labelled, simulated
   checkout with no Razorpay calls. Development only.
