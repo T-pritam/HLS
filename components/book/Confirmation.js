@@ -7,6 +7,8 @@ import { Inr, telHref, whatsappHref } from './format';
 const POLL_FAST_MS = 1000;
 const POLL_MS = 2500;
 const PATIENCE_MS = 90000;
+// Stop checking after this; the student can check again with a button.
+const GIVE_UP_MS = 180000;
 
 function SupportLine({ contact }) {
   const items = [
@@ -65,11 +67,14 @@ export default function Confirmation({ leadId, token, durationMin, contact }) {
   const [s, setS] = useState(null);
   const [error, setError] = useState(!leadId || !token);
   const [waitedLong, setWaitedLong] = useState(false);
+  const [stopped, setStopped] = useState(false);
+  const [round, setRound] = useState(0);
   const started = useRef(0);
 
   useEffect(() => {
     if (!leadId || !token) return;
     started.current = Date.now();
+    setStopped(false);
     let timer;
     let stop = false;
     const poll = async () => {
@@ -97,15 +102,20 @@ export default function Confirmation({ leadId, token, durationMin, contact }) {
       } catch {
         // Network blip: keep polling.
       }
-      if (Date.now() - started.current > PATIENCE_MS) setWaitedLong(true);
-      timer = setTimeout(poll, Date.now() - started.current < 15000 ? POLL_FAST_MS : POLL_MS);
+      const waited = Date.now() - started.current;
+      if (waited > PATIENCE_MS) setWaitedLong(true);
+      if (waited > GIVE_UP_MS) {
+        setStopped(true);
+        return;
+      }
+      timer = setTimeout(poll, waited < 15000 ? POLL_FAST_MS : POLL_MS);
     };
     poll();
     return () => {
       stop = true;
       clearTimeout(timer);
     };
-  }, [leadId, token]);
+  }, [leadId, token, round]);
 
   if (error) {
     return (
@@ -140,6 +150,11 @@ export default function Confirmation({ leadId, token, durationMin, contact }) {
               soon as the confirmation arrives, even if you close this page. Your booking reference is{' '}
               <strong>{s.leadId}</strong>.
             </p>
+          )}
+          {stopped && (
+            <button type="button" className="btn-secondary mt-6" onClick={() => setRound((r) => r + 1)}>
+              Check again
+            </button>
           )}
           <SupportLine contact={contact} />
         </>
