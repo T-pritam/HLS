@@ -6,19 +6,28 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint \"app/(book)\" app/api components/book lib/book scripts eslint.config.mjs",
+    "lint:all": "eslint .",
+    "assets:book": "node scripts/build-book-assets.mjs",
+    "test:book": "node scripts/book-flow-test.mjs"
   },
   "dependencies": {
     "framer-motion": "^12.43.0",
     "gsap": "^3.15.0",
     "lenis": "^1.3.25",
     "next": "^15.5.22",
+    "razorpay": "^2.9.8",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.7",
     "@tailwindcss/postcss": "^4.3.3",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^15.5.22",
     "postcss": "^8.5.25",
+    "sharp": "^0.35.5",
     "tailwindcss": "^4.3.3"
   }
 }

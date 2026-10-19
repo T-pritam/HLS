@@ -1,0 +1,276 @@
+@import 'tailwindcss';
+
+/* Brand tokens, duplicated from the teaser's (site)/globals.css on purpose so
+   the two root layouts stay independent. */
+@theme {
+  --color-hls-black: #000000;
+  --color-hls-navy: #102030;
+  --color-hls-deep: #0c4373;
+  --color-hls-steel: #2b6ea3;
+  --color-hls-signal: #1273c2;
+  --color-hls-platinum: #e4e9ec;
+  --color-hls-slate: #6a6e70;
+  --color-hls-mist: #8c97a0;
+
+  /* Derived for the light page: text and surfaces that keep AA contrast. */
+  --color-hls-ink: #102030;
+  --color-hls-muted: #44505c;
+  --color-hls-paper: #ffffff;
+  --color-hls-wash: #f2f5f7;
+  --color-hls-line: #d3dadf;
+  --color-hls-signal-dark: #0e5ea0;
+  --color-hls-error: #b42318;
+
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-body: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+    scroll-padding-top: 1rem;
+  }
+
+  body.book-body {
+    margin: 0;
+    background-color: var(--color-hls-paper);
+    color: var(--color-hls-ink);
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.6;
+    overflow-x: clip;
+  }
+
+  ::selection {
+    background-color: #cfe3f5;
+    color: var(--color-hls-navy);
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-hls-signal);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  a {
+    color: var(--color-hls-signal-dark);
+    text-underline-offset: 3px;
+  }
+}
+
+@layer components {
+  .wrap {
+    width: 100%;
+    max-width: 1120px;
+    margin-inline: auto;
+    padding-inline: 20px;
+  }
+
+  @media (min-width: 768px) {
+    .wrap {
+      padding-inline: 40px;
+    }
+  }
+
+  .label {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 1.4;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .section {
+    padding-block: 72px;
+  }
+
+  @media (min-width: 768px) {
+    .section {
+      padding-block: 104px;
+    }
+  }
+
+  .h-section {
+    font-size: clamp(32px, 6vw, 52px);
+    line-height: 1.08;
+  }
+
+  .lede {
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--color-hls-muted);
+    max-width: 640px;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 52px;
+    padding: 14px 24px;
+    border-radius: 4px;
+    background-color: var(--color-hls-signal);
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 17px;
+    line-height: 1.2;
+    text-decoration: none;
+    border: 0;
+    cursor: pointer;
+    transition: background-color 150ms ease;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--color-hls-signal-dark);
+  }
+
+  .btn-primary:disabled {
+    background-color: var(--color-hls-mist);
+    cursor: not-allowed;
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 12px 20px;
+    border-radius: 4px;
+    border: 1px solid var(--color-hls-line);
+    background: #ffffff;
+    color: var(--color-hls-ink);
+    font-weight: 500;
+    font-size: 16px;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--color-hls-steel);
+  }
+
+  .field {
+    display: block;
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 14px;
+    border: 1px solid #9aa6b0;
+    border-radius: 4px;
+    background: #ffffff;
+    color: var(--color-hls-ink);
+    font: inherit;
+    font-size: 17px;
+  }
+
+  .field[aria-invalid='true'] {
+    border-color: var(--color-hls-error);
+    box-shadow: 0 0 0 1px var(--color-hls-error);
+  }
+
+  .field-error {
+    margin-top: 6px;
+    font-size: 15px;
+    color: var(--color-hls-error);
+  }
+
+  .choice {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    min-height: 44px;
+    padding: 10px 0;
+    cursor: pointer;
+  }
+
+  .choice input {
+    flex: none;
+    width: 22px;
+    height: 22px;
+    margin-top: 2px;
+    accent-color: var(--color-hls-signal);
+  }
+
+  .rupee {
+    font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+    font-weight: inherit;
+  }
+
+  .todo-marker {
+    display: inline-block;
+    padding: 1px 6px;
+    border: 1px dashed #b45309;
+    border-radius: 3px;
+    background: #fff7ed;
+    color: #92400e;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+  }
+
+  .prose-legal h2 {
+    margin-top: 2.25rem;
+    font-size: 26px;
+    line-height: 1.2;
+  }
+
+  .prose-legal p,
+  .prose-legal li {
+    max-width: 680px;
+    color: var(--color-hls-ink);
+  }
+
+  .prose-legal p + p,
+  .prose-legal ul {
+    margin-top: 0.85rem;
+  }
+
+  .prose-legal ul {
+    padding-left: 1.25rem;
+    list-style: disc;
+  }
+
+  .prose-legal li + li {
+    margin-top: 0.4rem;
+  }
+}
+
+/* The FAQ marker */
+details > summary {
+  list-style: none;
+}
+
+details > summary::-webkit-details-marker {
+  display: none;
+}
+
+details[open] .faq-sign {
+  transform: rotate(45deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
