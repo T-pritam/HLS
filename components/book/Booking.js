@@ -391,7 +391,7 @@ export default function Booking({ variant, priceInr, taxLabel, paymentMode, slot
       rzp.on('payment.failed', (r) => {
         setNotice({
           kind: 'error',
-          text: `The payment did not go through${r?.error?.description ? `: ${r.error.description}` : ''}. You can try again in the payment window.`,
+          text: `The payment did not go through${r?.error?.description ? `: ${r.error.description.replace(/[.\s]+$/, '')}` : ''}. You can try again in the payment window.`,
         });
       });
       rzp.open();

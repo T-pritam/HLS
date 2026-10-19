@@ -41,7 +41,7 @@ function Receipt({ s }) {
     s.paymentId && ['Payment reference', s.paymentId],
     s.orderId && ['Order reference', s.orderId],
     ['Booking reference', s.leadId],
-    s.email && ['Confirmation sent to', s.email],
+    s.email && ['Your email', s.email],
   ].filter(Boolean);
   return (
     <dl className="mt-8 divide-y divide-hls-line rounded-md border border-hls-line bg-white px-5">

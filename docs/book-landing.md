@@ -62,6 +62,8 @@ With `BOOK_ADMIN_TOKEN` set (send it as `Authorization: Bearer …`):
 - `PATCH /api/book/admin/leads` `{ leadId, status, owner, nextAction, note }`.
   Statuses: New, Booked, Attended, Blueprint delivered, In counselling, Enrolled, Refunded, Closed.
 - `POST /api/book/admin/refund` `{ leadId, reason }`: full refund
+- `POST /api/book/admin/reconcile`: asks Razorpay about every open unpaid order
+  and books any that were paid. A backstop for missed webhooks; safe to run on a schedule.
 
 ## Checks
 
@@ -74,10 +76,20 @@ BASE_URL=http://localhost:3300 npm run test:book   # payment and booking cases
 
 `test:book` needs `BOOK_ADMIN_TOKEN` and `BOOK_TEST_HOOKS=true` in `.env.local`,
 plus mock mode or test keys with the webhook secret. It signs webhooks locally
-the same way Razorpay does.
+the same way Razorpay does. In test mode it creates real Razorpay test orders;
+its refund case only runs in mock mode, because a refund needs a real payment.
+
+Real test payments: in Razorpay's test checkout choose Netbanking, any bank,
+then "Success" or "Failure" on the demo bank page. Razorpay ignores obvious
+dummy mobile numbers such as 9876543210 in prefill, so use another number.
+
+To receive Razorpay's own webhooks locally, run `cloudflared tunnel --url
+http://localhost:3300` and add `<tunnel URL>/api/book/webhook` in the Razorpay
+dashboard (Settings → Webhooks, test mode) with the same secret as
+`RAZORPAY_WEBHOOK_SECRET` and the events listed above.
 
 ## Still needed before launch
 
-- Real Razorpay test run with your keys and a tunnel to `/api/book/webhook`.
+- Razorpay delivering its own webhooks (register the URL in the dashboard). Test-mode payments, failures, cancel, refund and reconcile were run for real on 19 Oct 2026.
 - Real phone checks in the Instagram and WhatsApp in-app browsers.
 - Values for every unset env var, approved legal text, and the PM decisions in the build report.

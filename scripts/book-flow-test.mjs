@@ -303,14 +303,14 @@ console.log(`Testing ${BASE} in ${MODE} mode\n`);
   check('Two people, same slot: exactly one hold succeeds', codes[0] === 200 && codes[1] === 409, codes.join(','));
 }
 
-// 8. Refund path
-{
+// 8. Refund path (mock mode; in test mode refunds need a real payment, so run
+//    a real checkout and POST /api/book/admin/refund instead)
+if (MODE !== 'mock') {
+  console.log('SKIP  Refund path: needs a real test payment in test mode (see docs/book-landing.md)');
+} else {
   const { l } = await bookedLead();
   const slotId = (await status(l)).slot.id;
   const r = await admin('/api/book/admin/refund', { body: { leadId: l.leadId, reason: 'QA' } });
-  if (MODE !== 'mock') {
-    await webhook('refund.processed', { refund: { entity: { id: `rfnd_qa${randomUUID().slice(0, 8)}`, payment_id: (await getLead(l.leadId)).paymentId, amount: PRICE_PAISE, status: 'processed' } } });
-  }
   const s = await waitFor(async () => {
     const x = await status(l);
     return x?.status === 'Refunded' && x;
