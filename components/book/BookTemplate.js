@@ -4,8 +4,8 @@ import Booking from './Booking';
 import StickyCta from './StickyCta';
 import { HeroAttempt, HeroDiagnosis, HeroSample } from './Hero';
 import {
-  Check,
   Consultation,
+  Icon,
   Example,
   Faq,
   Mentor,
@@ -41,6 +41,7 @@ const ORDER = {
 const NAV = [
   { href: '#what-you-get', label: 'What you get' },
   { href: '#how-it-works', label: 'How it works' },
+  { href: '#pricing', label: 'Price' },
   { href: '#faqs', label: 'FAQs' },
 ];
 
@@ -81,39 +82,46 @@ export default function BookTemplate({ requested = 'a' }) {
         {ORDER[variant].map((key) => sections[key])}
 
         <section id="book" aria-labelledby="book-title" className="section bg-hls-wash">
-          <div className="wrap grid gap-10 lg:grid-cols-[1fr_1.5fr] lg:gap-16">
-            <div className="lg:sticky lg:top-24 lg:self-start">
-              <p className="label text-hls-signal-dark">Book</p>
-              <h2 id="book-title" className="h-section mt-4">
+          <div className="wrap">
+            <div className="mx-auto max-w-2xl text-center">
+              <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-hls-line bg-white">
+                <Icon name="calendar" size={22} />
+              </span>
+              <h2 id="book-title" className="h-section mt-6">
                 Make your next attempt with a clearer plan.
               </h2>
-              <p className="lede mt-5">
-                <Inr amount={cfg.priceInr} />, {cfg.taxLabel}. For CA Final Group 1 repeaters only.
+              <p className="lede mx-auto mt-5">
+                Find where your marks are breaking, and leave with a written blueprint for what to do next.
               </p>
-              <ol className="mt-8 space-y-3">
+              <p className="mt-6 font-display text-[24px] leading-tight md:text-[28px]">
+                <Inr amount={cfg.priceInr} /> <span className="text-hls-muted">· {cfg.taxLabel}</span>
+              </p>
+              <ol className="mt-8 flex flex-col items-center gap-3 text-[15px] sm:flex-row sm:justify-center sm:gap-6">
                 {BOOK_STEPS.map((t, i) => (
-                  <li key={t} className="flex items-center gap-3">
-                    <span className="label flex h-8 w-8 flex-none items-center justify-center rounded-full border border-hls-line bg-white text-hls-signal-dark">
+                  <li key={t} className="flex items-center gap-2.5">
+                    <span className="label flex h-7 w-7 flex-none items-center justify-center rounded-full border border-hls-line bg-white text-hls-signal-dark">
                       {i + 1}
                     </span>
                     {t}
                   </li>
                 ))}
               </ol>
-              <p className="mt-8 flex items-start gap-3 text-[15px] text-hls-muted">
-                <Check />
+            </div>
+            <div className="mx-auto mt-12 max-w-2xl">
+              <Booking
+                variant={variant}
+                priceInr={cfg.priceInr}
+                taxLabel={cfg.taxLabel}
+                paymentMode={cfg.paymentMode}
+                slotsSynthetic={cfg.slotsSynthetic}
+                holdMinutes={cfg.holdMinutes}
+                contact={{ phone: cfg.supportPhone, whatsapp: cfg.supportWhatsApp, email: cfg.supportEmail }}
+              />
+              <p className="mt-6 flex items-center justify-center gap-2 text-center text-[15px] text-hls-muted">
+                <Icon name="shield" size={18} className="text-hls-muted" />
                 No obligation to join anything afterwards.
               </p>
             </div>
-            <Booking
-              variant={variant}
-              priceInr={cfg.priceInr}
-              taxLabel={cfg.taxLabel}
-              paymentMode={cfg.paymentMode}
-              slotsSynthetic={cfg.slotsSynthetic}
-              holdMinutes={cfg.holdMinutes}
-              contact={{ phone: cfg.supportPhone, whatsapp: cfg.supportWhatsApp, email: cfg.supportEmail }}
-            />
           </div>
         </section>
       </main>

@@ -45,6 +45,12 @@
     overflow-x: clip;
   }
 
+  @media (min-width: 768px) {
+    body.book-body {
+      font-size: 18px;
+    }
+  }
+
   ::selection {
     background-color: #cfe3f5;
     color: var(--color-hls-navy);
@@ -137,6 +143,18 @@
     border: 1px solid var(--color-hls-line);
     border-radius: 8px;
     background: #ffffff;
+  }
+
+  .card-hover {
+    transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+  }
+
+  @media (hover: hover) {
+    .card-hover:hover {
+      border-color: #b5c3cf;
+      box-shadow: 0 16px 32px -24px rgba(16, 32, 48, 0.4);
+      transform: translateY(-2px);
+    }
   }
 
   .callout {
@@ -338,7 +356,7 @@ details > summary::-webkit-details-marker {
 }
 
 details[open] .faq-sign {
-  transform: rotate(45deg);
+  transform: rotate(180deg);
 }
 
 @media (prefers-reduced-motion: reduce) {

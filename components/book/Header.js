@@ -19,9 +19,9 @@ export default function Header({ ctaHref = '#book', showCta = true, links = [] }
 
   return (
     <header className="sticky top-0 z-40 border-b border-hls-line bg-white/90 backdrop-blur">
-      <div className="wrap flex min-h-16 items-center justify-between gap-4 py-2">
+      <div className="wrap flex min-h-16 items-center justify-between gap-4 py-1.5">
         <a href="/book" className="-m-2 block p-2" aria-label="HIM LIFE SCHOOL, Blueprint Consultation">
-          <Logo tone="light" priority className="block w-[110px] sm:w-[140px] [&_img]:w-full" />
+          <Logo tone="light" priority className="block w-[104px] sm:w-[120px] [&_img]:w-full" />
         </a>
 
         <nav aria-label="Page" className="hidden items-center gap-6 md:flex lg:gap-8">

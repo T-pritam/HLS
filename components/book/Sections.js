@@ -22,6 +22,24 @@ export function Check({ className = 'text-hls-signal' }) {
   );
 }
 
+const ICONS = {
+  chat: 'M4 5h12v8H9l-4 3v-3H4z',
+  doc: 'M6 3h6l3 3v11H6zM12 3v3h3M8.5 10h4M8.5 13h4',
+  target: 'M10 3a7 7 0 100 14 7 7 0 000-14zm0 3.5a3.5 3.5 0 100 7 3.5 3.5 0 000-7zm0 3a.5.5 0 100 1 .5.5 0 000-1z',
+  shield: 'M10 3l6 2.5v4c0 3.6-2.5 6.3-6 7.5-3.5-1.2-6-3.9-6-7.5v-4zM7.5 10l1.8 1.8L12.8 8.3',
+  calendar: 'M4 6h12v10H4zM4 9h12M7.5 4v3M12.5 4v3',
+  chevron: 'M5.5 8l4.5 4.5L14.5 8',
+};
+
+/** A small line icon from the set above. */
+export function Icon({ name, className = 'text-hls-signal-dark', size = 20 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 20 20" aria-hidden="true" className={`flex-none ${className}`} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d={ICONS[name]} />
+    </svg>
+  );
+}
+
 function Cross() {
   return (
     <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" className="mt-[3px] flex-none text-hls-mist">
@@ -167,7 +185,7 @@ export function WhatYouGet({ cfg }) {
         <SectionHead kicker="What you get" id="get-title" title="Three questions your blueprint answers." />
         <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {QUESTIONS.map((c) => (
-            <div key={c.q} className="card flex flex-col p-6 md:p-7">
+            <div key={c.q} className="card card-hover flex flex-col p-6 md:p-7">
               <div className="flex h-11 w-11 items-center justify-center rounded-md bg-hls-wash text-hls-signal-dark">
                 <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
                   <path d={c.icon} />
@@ -218,13 +236,19 @@ export function Consultation({ cfg }) {
           />
           <div className="space-y-8">
             <div>
-              <h3 className="h-card">The one-to-one consultation</h3>
+              <h3 className="h-card flex items-center gap-3">
+                <Icon name="chat" />
+                The one-to-one consultation
+              </h3>
               <p className="mt-3 text-hls-muted">
                 A conversation about your attempt: what you studied, how you prepared, and what happened in the paper.
               </p>
             </div>
             <div>
-              <h3 className="h-card">Your written blueprint</h3>
+              <h3 className="h-card flex items-center gap-3">
+                <Icon name="doc" />
+                Your written blueprint
+              </h3>
               <p className="mt-3 text-hls-muted">
                 Where you stand, the specific gaps, your priorities and a realistic plan for your next steps, in
                 writing.
@@ -488,9 +512,14 @@ export function Pricing({ cfg }) {
 
   return (
     <section id="pricing" aria-labelledby="pricing-title" className="section bg-hls-wash">
-      <div className="wrap">
-        <SectionHead kicker="Price" id="pricing-title" title="Start with a clear diagnosis." />
-        <div className="card mt-12 max-w-2xl p-6 sm:p-8 md:p-10">
+      <div className="wrap grid gap-12 lg:grid-cols-[1fr_1.25fr] lg:items-start lg:gap-16">
+        <div className="lg:sticky lg:top-28">
+          <SectionHead kicker="Price" id="pricing-title" title="Start with a clear diagnosis." />
+          <p className="lede mt-6">
+            One payment for the consultation and your written blueprint. Nothing else is sold on this page.
+          </p>
+        </div>
+        <div className="card p-6 shadow-[0_24px_48px_-32px_rgba(16,32,48,0.35)] sm:p-8 md:p-10">
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div>
               <h3 className="text-[24px] leading-tight md:text-[28px]">The Blueprint Consultation</h3>
@@ -522,8 +551,8 @@ export function Pricing({ cfg }) {
               {!cfg.consultantName && <Todo show>consultant name</Todo>}
             </p>
           )}
-          <div className="callout mt-8 bg-hls-wash">
-            <Check />
+          <div className="callout mt-8">
+            <Icon name="shield" />
             <p>No obligation to join anything afterwards.</p>
           </div>
           <a href="#book" className="btn-primary mt-8 w-full">
@@ -638,20 +667,18 @@ export function faqItems(cfg) {
 export function Faq({ cfg }) {
   return (
     <section id="faqs" aria-labelledby="faq-title" className="section">
-      <div className="wrap grid gap-10 lg:grid-cols-[1fr_2fr] lg:gap-16">
-        <div>
-          <SectionHead kicker="FAQs" id="faq-title" title="Questions before you book" />
-        </div>
-        <div className="border-t border-hls-line">
+      <div className="wrap">
+        <SectionHead kicker="FAQs" id="faq-title" title="Questions before you book" />
+        <div className="mt-10 border-t border-hls-line">
           {faqItems(cfg).map(([q, a]) => (
             <details key={q} className="group border-b border-hls-line">
-              <summary className="flex min-h-[56px] cursor-pointer items-center justify-between gap-6 py-5 text-[17px] font-medium md:text-[18px]">
+              <summary className="flex min-h-[56px] cursor-pointer items-center justify-between gap-6 py-5 text-[17px] font-semibold transition-colors hover:text-hls-signal-dark md:text-[18px]">
                 {q}
-                <span aria-hidden="true" className="faq-sign flex-none text-[24px] leading-none text-hls-signal-dark transition-transform">
-                  +
+                <span className="faq-sign transition-transform">
+                  <Icon name="chevron" />
                 </span>
               </summary>
-              <div className="pb-6 text-hls-muted">{a}</div>
+              <div className="max-w-3xl pb-6 text-hls-muted">{a}</div>
             </details>
           ))}
         </div>

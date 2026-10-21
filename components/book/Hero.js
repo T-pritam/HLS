@@ -1,9 +1,16 @@
 import AttemptPicker from './AttemptPicker';
 import BookPhoto from './BookPhoto';
-import { Check } from './Sections';
+import { Icon } from './Sections';
 import { Inr } from './format';
 
-const POINTS = ['One-to-one consultation', 'A written blueprint you keep', 'For CA Final Group 1 repeaters'];
+const POINTS = [
+  ['chat', 'One-to-one consultation'],
+  ['doc', 'A written blueprint you keep'],
+  ['target', 'For CA Final Group 1 repeaters'],
+];
+
+// What the blueprint covers, for the card over the hero photo.
+const COVERS = ['Where you stand', 'The specific gaps', 'Your priorities', 'A realistic plan'];
 
 function PriceLine({ cfg }) {
   return (
@@ -29,8 +36,9 @@ function Cta() {
           See what you get <span aria-hidden="true">→</span>
         </a>
       </div>
+      <p className="mt-4 text-[15px] text-hls-muted">Three short steps: confirm you are eligible, give your details, then choose a time and pay.</p>
       <div className="callout mt-6 max-w-xl">
-        <Check />
+        <Icon name="shield" />
         <p>No obligation to join anything afterwards. The consultation is complete on its own.</p>
       </div>
     </>
@@ -40,9 +48,9 @@ function Cta() {
 function Points() {
   return (
     <ul className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-x-6">
-      {POINTS.map((p) => (
-        <li key={p} className="flex items-center gap-2 text-[16px]">
-          <Check />
+      {POINTS.map(([icon, p]) => (
+        <li key={p} className="flex items-center gap-2.5 text-[16px]">
+          <Icon name={icon} />
           {p}
         </li>
       ))}
@@ -52,12 +60,31 @@ function Points() {
 
 function HeroPhoto() {
   return (
-    <BookPhoto
-      name="hands-writing"
-      alt="A marked answer sheet and a pen under a desk lamp."
-      priority
-      className="shadow-[0_24px_48px_-24px_rgba(16,32,48,0.45)]"
-    />
+    <div className="relative sm:pb-10 lg:pb-0">
+      <BookPhoto
+        name="hands-writing"
+        alt="A marked answer sheet and a pen under a desk lamp."
+        priority
+        className="shadow-[0_24px_48px_-24px_rgba(16,32,48,0.45)]"
+      />
+      {/* A glimpse of the blueprint. Decorative: the same points are in the text. */}
+      <div
+        aria-hidden="true"
+        className="card absolute bottom-0 left-4 hidden w-[15.5rem] p-5 shadow-[0_20px_40px_-20px_rgba(16,32,48,0.45)] sm:block lg:-bottom-8 lg:-left-8"
+      >
+        <p className="label text-hls-signal-dark">Your blueprint</p>
+        <ul className="mt-3 space-y-2 text-[15px]">
+          {COVERS.map((c, i) => (
+            <li key={c} className="flex items-center gap-2.5">
+              <span className="label flex h-6 w-6 flex-none items-center justify-center rounded-full bg-hls-wash text-hls-signal-dark">
+                {i + 1}
+              </span>
+              {c}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
   );
 }
 
