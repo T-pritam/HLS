@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from 'react';
 
-/** Mobile-only bar with the one primary action. Hidden over the hero and the booking form. */
-export default function StickyCta({ label }) {
+/** Mobile-only bar with the price and the one primary action. Hidden over the hero, pricing and the booking form. */
+export default function StickyCta({ price, note }) {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    const targets = ['hero', 'book'].map((id) => document.getElementById(id)).filter(Boolean);
+    const targets = ['hero', 'pricing', 'book'].map((id) => document.getElementById(id)).filter(Boolean);
     if (!targets.length || !('IntersectionObserver' in window)) return;
     const visible = new Map();
     const io = new IntersectionObserver((entries) => {
@@ -20,14 +20,20 @@ export default function StickyCta({ label }) {
 
   return (
     <div
-      className={`fixed inset-x-0 bottom-0 z-40 border-t border-hls-line bg-white/95 px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3 backdrop-blur md:hidden ${
-        show ? '' : 'pointer-events-none invisible'
+      className={`fixed inset-x-0 bottom-0 z-40 border-t border-hls-line bg-white/95 pb-[max(12px,env(safe-area-inset-bottom))] pt-3 backdrop-blur transition-transform duration-200 md:hidden ${
+        show ? 'translate-y-0' : 'pointer-events-none invisible translate-y-full'
       }`}
       aria-hidden={!show}
     >
-      <a href="#book" className="btn-primary w-full" tabIndex={show ? 0 : -1}>
-        {label}
-      </a>
+      <div className="wrap flex items-center justify-between gap-4">
+        <div className="min-w-0">
+          <p className="font-display text-[22px] leading-none">{price}</p>
+          <p className="mt-1 truncate text-[13px] text-hls-muted">{note}</p>
+        </div>
+        <a href="#book" className="btn-primary !min-h-12 flex-none !px-5 !text-[16px]" tabIndex={show ? 0 : -1}>
+          Book consultation
+        </a>
+      </div>
     </div>
   );
 }

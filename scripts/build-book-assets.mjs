@@ -42,6 +42,18 @@ for (const w of [64, 128]) {
   report.push([`crest-${w}.png`, 'hls_crest.png', await kb(src('hls_crest.png')), await kb(out(`crest-${w}.png`)), '']);
 }
 
+// Page photos, 3:2, at two widths each. WebP with a JPEG fallback.
+for (const name of ['hands-writing', 'two-chairs']) {
+  const file = `photos/${name}.png`;
+  for (const w of [720, 1280]) {
+    const img = sharp(src(file)).resize({ width: w });
+    await img.clone().webp({ quality: 78, effort: 6 }).toFile(out(`${name}-${w}.webp`));
+    await img.clone().jpeg({ quality: 80, mozjpeg: true }).toFile(out(`${name}-${w}.jpg`));
+    report.push([`${name}-${w}.webp`, file, await kb(src(file)), await kb(out(`${name}-${w}.webp`)), '']);
+    report.push([`${name}-${w}.jpg`, file, await kb(src(file)), await kb(out(`${name}-${w}.jpg`)), '']);
+  }
+}
+
 // Share image: the dark lockup on Navy. Brand assets only, no claims.
 const logo = await (await trimmed('hls_logo_dark.png')).resize({ width: 640 }).png().toBuffer();
 const { height } = await sharp(logo).metadata();

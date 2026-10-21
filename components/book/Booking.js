@@ -477,7 +477,7 @@ export default function Booking({ variant, priceInr, taxLabel, paymentMode, slot
   }
 
   return (
-    <div className="rounded-md border border-hls-line bg-white p-5 sm:p-8">
+    <div className="card p-5 sm:p-8">
       <div aria-live="polite" aria-atomic="true">
         <Notice notice={notice} contact={contact} />
       </div>
