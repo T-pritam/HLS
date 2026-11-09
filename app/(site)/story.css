@@ -1,0 +1,58 @@
+/* The story's own styles. Loaded by app/page.js. */
+
+/* The nav's height, so pinned stages can sit clear of it. Story pages set
+   it from the header itself; these are its sizes before that runs. */
+#story {
+  --nav-h: 73px;
+}
+@media (min-width: 768px) {
+  #story {
+    --nav-h: 85px;
+  }
+}
+
+/* The hundred desks: a square that always fits under the nav with room to
+   spare. Below 1024px it sits under the number at most 88vw across, and
+   short enough to clear the ~480px of nav and number above it (tablets). */
+.desk-grid {
+  aspect-ratio: 1;
+  width: min(88vw, 70svh, max(240px, 100svh - 480px));
+  margin-inline: auto;
+}
+@media (min-width: 1024px) {
+  .desk-grid {
+    width: auto;
+    /* ...and never wider than its column (58% of the 1600px container). */
+    height: min(calc(100svh - var(--nav-h, 120px) - 72px), 46vw, calc((min(100vw, 1600px) - 120px) * 0.58));
+  }
+}
+
+/* The lit desks are promoted only while the number's stage is in play. */
+.story-number.is-active .desk-lit {
+  will-change: transform, opacity;
+}
+.story-filter.is-active [data-layer] {
+  will-change: transform, opacity;
+}
+
+/* Signal Blue for small type on black: Signal itself is 4.25:1 there, this
+   lighter step is 6:1 and reads as the same blue. */
+.text-signal-read {
+  color: #3d8edb;
+}
+.border-signal-read {
+  border-color: #3d8edb;
+}
+
+/* The shared text frame, 1024px and up. --frame-l is the frame's left edge,
+   for containers that keep a full-bleed visual beside their text. */
+@media (min-width: 1024px) {
+  #story {
+    --frame-g: clamp(32px, 6vw, 96px);
+    --frame-l: max(calc((100% - 1280px) / 2), var(--frame-g));
+  }
+  .story-frame {
+    width: min(1280px, 100% - 2 * var(--frame-g));
+    margin-inline: auto;
+  }
+}

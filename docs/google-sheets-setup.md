@@ -68,7 +68,7 @@ BOOK_SHEETS_URL=<the Web app URL ending in /exec>
 BOOK_SHEETS_SECRET=<the same secret as the script property>
 ```
 
-Redeploy, then submit the form on `/book`. A row should appear in **Leads**
+Redeploy, then submit the form on `/sip`. A row should appear in **Leads**
 within a few seconds.
 
 ## If something goes wrong

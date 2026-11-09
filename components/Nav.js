@@ -2,27 +2,9 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Image from 'next/image';
+import PillLink from '@/components/ui/PillLink';
 import { LANDING_URL } from '@/lib/motion';
-
-function Arrow({ className = '' }) {
-  return (
-    <svg
-      className={className}
-      width="12"
-      height="12"
-      viewBox="0 0 12 12"
-      fill="none"
-      aria-hidden="true"
-    >
-      <path
-        d="M2.5 9.5L9.5 2.5M9.5 2.5H4M9.5 2.5V8"
-        stroke="currentColor"
-        strokeWidth="1.4"
-        strokeLinecap="square"
-      />
-    </svg>
-  );
-}
+import { CTA_LABEL } from '@/lib/story-facts';
 
 /** The crest and one way forward. Nothing else. */
 export default function Nav() {
@@ -58,7 +40,10 @@ export default function Nav() {
     };
   }, []);
 
+  // On the home page the crest scrolls back to the top, anywhere else (the
+  // 404 page) it goes home.
   const toTop = useCallback((e) => {
+    if (window.location.pathname !== '/') return;
     e.preventDefault();
     if (window.__lenis) window.__lenis.scrollTo(0, { duration: 1.4 });
     else window.scrollTo(0, 0);
@@ -78,28 +63,27 @@ export default function Nav() {
     >
       <nav className="mx-auto flex h-[72px] w-full max-w-[1600px] items-center justify-between gap-4 px-5 md:h-[84px] md:px-10">
         <a
-          href="#top"
+          href="/"
           onClick={toTop}
-          aria-label="HIM LIFE SCHOOL, back to top"
+          aria-label="HIM LIFE SCHOOL, home"
           className="flex shrink-0 items-center"
         >
+          {/* 40px tall on phones, up to 60px on desktop; the bar's height is
+              unchanged, so --nav-h stays as it is. */}
           <Image
             src="/hls_crest.png"
             alt="HIM LIFE SCHOOL"
-            width={706}
-            height={930}
+            width={46}
+            height={60}
             priority
-            className="h-[30px] w-auto"
+            className="h-[40px] w-auto md:h-[clamp(44px,3.2vw,60px)]"
           />
         </a>
 
-        <a
-          href={LANDING_URL}
-          className="group inline-flex items-center gap-2 whitespace-nowrap bg-hls-signal px-3.5 py-2.5 font-mono text-[11px] font-medium uppercase leading-[1.2] tracking-[0.14em] text-hls-black transition-opacity duration-300 hover:opacity-85 sm:text-[12px] sm:tracking-[0.22em] md:px-5"
-        >
-          <span>Find where yours breaks</span>
-          <Arrow className="shrink-0 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-        </a>
+        {/* Navy over a light panel, Platinum everywhere else. */}
+        <PillLink href={LANDING_URL} size="md" tone={light ? 'light' : 'dark'}>
+          {CTA_LABEL}
+        </PillLink>
       </nav>
     </header>
   );

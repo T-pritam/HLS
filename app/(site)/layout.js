@@ -4,11 +4,11 @@ import SmoothScroll from '@/components/SmoothScroll';
 import Preloader from '@/components/Preloader';
 import Cursor from '@/components/Cursor';
 import Nav from '@/components/Nav';
-import InkFilter from '@/components/InkFilter';
 
 const fraunces = Fraunces({
   subsets: ['latin'],
   axes: ['opsz'],
+  style: ['normal', 'italic'],
   variable: '--font-fraunces',
   display: 'swap',
 });
@@ -27,14 +27,16 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata = {
-  title: 'HIM LIFE SCHOOL',
-  description: 'You know the syllabus. So why did the marks not come?',
+  title: 'At Your Own Desk · HIM LIFE SCHOOL',
+  description: "For CA Final Group 1 repeaters. You worked. You still don't know why.",
   metadataBase: new URL('https://himlifeschool.com'),
   openGraph: {
-    title: 'HIM LIFE SCHOOL',
-    description: 'You know the syllabus. So why did the marks not come?',
+    title: 'At Your Own Desk · HIM LIFE SCHOOL',
+    description: "For CA Final Group 1 repeaters. You worked. You still don't know why.",
     type: 'website',
   },
+  // Kept out of search until launch. Set NEXT_PUBLIC_NOINDEX to "true" on previews.
+  ...(process.env.NEXT_PUBLIC_NOINDEX === 'true' ? { robots: { index: false, follow: false } } : {}),
 };
 
 export const viewport = {
@@ -70,7 +72,6 @@ export default function RootLayout({ children }) {
         */}
       </head>
       <body className="bg-hls-black text-hls-platinum antialiased">
-        <InkFilter />
         <Preloader />
         <Cursor />
         <SmoothScroll />

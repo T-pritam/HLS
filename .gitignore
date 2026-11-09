@@ -4,3 +4,8 @@ node_modules
 .env*
 !.env.example
 .data/
+.vercel
+# Unused creative zips in public/: kept locally, not published.
+public/photos/*.zip
+# Leftover images from the Website project: kept locally, never deployed.
+_unused-assets/

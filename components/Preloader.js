@@ -5,10 +5,10 @@ import Image from 'next/image';
 import { initGsap, reducedMotion } from '@/lib/motion';
 
 /**
- * 1.8s. The crest fades in, one Signal Blue line draws across the screen
- * behind it, then the black parts along that line and the page shows
- * through. Skipped under reduced motion, the overlay is hidden by CSS in
- * that case so there is no flash before this effect runs.
+ * 1.8s. The crest fades in, a blue pen line writes across the screen behind
+ * it, then the black parts along the line, the page shows through and the
+ * exam clock fades in. Skipped under reduced motion, the overlay is hidden
+ * by CSS in that case so there is no flash before this effect runs.
  */
 export default function Preloader() {
   const crest = useRef(null);
@@ -38,11 +38,12 @@ export default function Preloader() {
     // Fade in 0.7s, hold 0.6s, out 0.5s. The fade in is CSS on the image
     // (.preloader-crest img) so it starts with the first paint, this timeline
     // runs on the same clock from 0. The crest fades fast at first so it is
-    // nearly gone by the time the halves open behind it.
+    // nearly gone by the time the halves open behind it. The pen writes its
+    // line across at the speed of a hand.
     tl.fromTo(
       line.current,
       { scaleX: 0 },
-      { scaleX: 1, duration: 0.75, ease: 'power3.inOut' },
+      { scaleX: 1, duration: 0.75, ease: 'power1.inOut' },
       0.45
     )
       .to(crest.current, { opacity: 0, duration: 0.5, ease: 'power2.out' }, 1.3)

@@ -164,7 +164,7 @@ export default function Confirmation({ leadId, token, durationMin, contact }) {
         <>
           <h1 className="text-[36px] leading-tight">The payment did not go through</h1>
           <p className="mt-4 text-hls-muted">Nothing has been booked, and the time you chose has been released.</p>
-          <a href="/book#book" className="btn-primary mt-6">
+          <a href="/sip#book" className="btn-primary mt-6">
             Try again
           </a>
           <SupportLine contact={contact} />

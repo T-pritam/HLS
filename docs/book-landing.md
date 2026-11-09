@@ -1,4 +1,4 @@
-# /book: Blueprint Consultation landing page (v1)
+# /sip (was /book): Blueprint Consultation landing page (v1)
 
 The paid-consultation page for CA Final Group 1 repeaters. It sells one thing,
 the Blueprint Consultation (₹3,000 inclusive of all taxes), and describes the
@@ -7,14 +7,14 @@ approved, and payments are Razorpay test mode only.
 
 ## Layout
 
-The app now has two root layouts, so `/book` inherits nothing from the teaser
+The app now has two root layouts, so `/sip` inherits nothing from the teaser
 (no preloader, cursor, smooth scroll, GSAP or black body):
 
 | Path | What |
 | --- | --- |
 | `app/(site)/` | The teaser, moved unchanged (`layout.js`, `page.js`, `globals.css`) |
-| `app/(book)/` | `/book` root layout (light theme, same fonts and tokens), pages and legal drafts |
-| `app/(book)/book/v/[variant]` | Static pages for `?v=b` and `?v=c` (rewritten in `next.config.mjs`) |
+| `app/(book)/` | `/sip` root layout (light theme, same fonts and tokens), pages and legal drafts |
+| `app/(book)/sip/v/[variant]` | Static pages for `?v=b` and `?v=c` (rewritten in `next.config.mjs`) |
 | `app/api/book/*` | Lead, slots, hold, order, verify, webhook, status, mock checkout, admin |
 | `components/book/` | Page sections, booking widget, confirmation |
 | `lib/book/` | Config, booking service, Razorpay gateway, store and adapters |

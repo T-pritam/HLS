@@ -1,24 +1,40 @@
-import Hero from '@/components/scenes/Hero';
-import Current from '@/components/scenes/Current';
-import Breaks from '@/components/scenes/Breaks';
-import Ribbon from '@/components/scenes/Ribbon';
-import Turn from '@/components/scenes/Turn';
+import './story.css';
+import Duotone from '@/components/Duotone';
+import StoryHero from '@/components/story/StoryHero';
+import StoryNumber from '@/components/story/StoryNumber';
+import StoryMoments from '@/components/story/StoryMoments';
+import StoryFilter from '@/components/story/StoryFilter';
+import StoryMarks from '@/components/story/StoryMarks';
 import Teacher from '@/components/scenes/Teacher';
-import WayIn from '@/components/scenes/WayIn';
-import Close from '@/components/scenes/Close';
+import HimakanthNote from '@/components/story/HimakanthNote';
+import StoryLampFlood from '@/components/story/StoryLampFlood';
+import StoryWays from '@/components/story/StoryWays';
+import StoryBlueprint from '@/components/story/StoryBlueprint';
+import StoryProof from '@/components/story/StoryProof';
+import StoryClose from '@/components/story/StoryClose';
+import StoryFooter from '@/components/story/StoryFooter';
 
-// One story. v1's seven sections are archived in components/sections/_v1.
+// "At your own desk": alone, with your own marks and your own questions.
 export default function Home() {
   return (
-    <>
-      <Hero />
-      <Current />
-      <Breaks />
-      <Ribbon />
-      <Turn />
-      <Teacher />
-      <WayIn />
-      <Close />
-    </>
+    <div id="story">
+      <Duotone />
+      <StoryHero />
+      <StoryNumber />
+      <StoryMoments />
+      <StoryFilter />
+      {/* Your own marks, worked out in the page. Not pinned. */}
+      <StoryMarks />
+      {/* The founder scene, with the story's words under the name. The flood
+          into it comes from the lamp, on its own overlay. */}
+      <StoryLampFlood />
+      <Teacher body={<HimakanthNote />} />
+      {/* Renders only with approved proof, or placeholders on the preview. */}
+      <StoryProof />
+      <StoryWays />
+      <StoryBlueprint />
+      <StoryClose />
+      <StoryFooter />
+    </div>
   );
 }

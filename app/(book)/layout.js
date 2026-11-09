@@ -1,7 +1,7 @@
 import { Fraunces, Hanken_Grotesk, IBM_Plex_Mono } from 'next/font/google';
 import './book.css';
 
-// Same three families as the teaser, declared again so /book shares nothing
+// Same three families as the teaser, declared again so /sip shares nothing
 // with the teaser's root layout (no preloader, cursor, smooth scroll or GSAP).
 const fraunces = Fraunces({
   subsets: ['latin'],

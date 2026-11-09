@@ -3,10 +3,10 @@ import Contact, { hasContact } from './Contact';
 import Todo from './Todo';
 
 const LINKS = [
-  { href: '/book/privacy', label: 'Privacy Notice' },
-  { href: '/book/terms', label: 'Terms of Use' },
-  { href: '/book/refund', label: 'Refund and Cancellation' },
-  { href: '/book/contact', label: 'Contact' },
+  { href: '/sip/privacy', label: 'Privacy Notice' },
+  { href: '/sip/terms', label: 'Terms of Use' },
+  { href: '/sip/refund', label: 'Refund and Cancellation' },
+  { href: '/sip/contact', label: 'Contact' },
 ];
 
 export default function Footer({ cfg }) {
