@@ -1,4 +1,4 @@
-import { getServerConfig } from '@/lib/book/config';
+import { getPublicConfig, getServerConfig } from '@/lib/book/config';
 import { isAdmin, json } from '@/lib/book/http';
 import { callSheets, sheetsConfigured } from '@/lib/book/sheets-client';
 
@@ -27,8 +27,8 @@ export async function GET(request) {
     sheetsConfigured: sheetsConfigured(),
     sheetsRole: !sheetsConfigured() ? 'off' : cfg.leadStore === 'google-sheets' ? 'store (slow)' : 'background copy',
     functionRegion: process.env.VERCEL_REGION ?? 'local',
-    paymentMode: cfg.payment.mode,
-    paymentsReady: cfg.payment.ready,
+    calendlyConfigured: Boolean(getPublicConfig().calendlyUrl),
+    calendlyTimeLookup: Boolean(cfg.calendlyApiToken),
     testHooks: cfg.testHooks,
   };
   if (cfg.testHooks && process.env.VERCEL) body.warning = 'BOOK_TEST_HOOKS is on; set it to false on the live site.';

@@ -1,7 +1,6 @@
 import AttemptPicker from './AttemptPicker';
 import BookPhoto from './BookPhoto';
 import { Icon } from './Sections';
-import { Inr } from './format';
 
 const POINTS = [
   ['chat', 'One-to-one consultation'],
@@ -16,11 +15,9 @@ function PriceLine({ cfg }) {
   return (
     <div className="mt-8">
       <p className="font-display text-[30px] leading-none md:text-[36px]">
-        <Inr amount={cfg.priceInr} />
+        Free
       </p>
-      <p className="mt-2 text-[15px] text-hls-muted">
-        {cfg.taxLabel.charAt(0).toUpperCase() + cfg.taxLabel.slice(1)} · One-time payment
-      </p>
+      <p className="mt-2 text-[15px] text-hls-muted">No payment needed · One-to-one consultation</p>
     </div>
   );
 }
@@ -36,7 +33,7 @@ function Cta() {
           See what you get <span aria-hidden="true">→</span>
         </a>
       </div>
-      <p className="mt-4 text-[15px] text-hls-muted">Three short steps: confirm you are eligible, give your details, then choose a time and pay.</p>
+      <p className="mt-4 text-[15px] text-hls-muted">Three short steps: confirm you are eligible, give your details, then choose a time.</p>
       <div className="callout mt-6 max-w-xl">
         <Icon name="shield" />
         <p>No obligation to join anything afterwards. The consultation is complete on its own.</p>

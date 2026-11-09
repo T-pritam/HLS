@@ -12,7 +12,7 @@ const nextConfig = {
       { source: '/story', destination: '/', permanent: true },
       // The booking page moved from /book to /sip. Kept temporary until the move is final.
       { source: '/book', destination: '/sip', permanent: false },
-      { source: '/book/:page(confirmation|intake|privacy|terms|refund|contact)', destination: '/sip/:page', permanent: false },
+      { source: '/book/:page(intake|privacy|terms|contact)', destination: '/sip/:page', permanent: false },
     ];
   },
   // /sip page variants (?v=b, ?v=c) are separate static pages; the URL stays /sip?v=…

@@ -5,9 +5,9 @@ One Next.js app serves the whole site:
 | URL | What |
 |---|---|
 | `/` | Home page, the "At Your Own Desk" story |
-| `/sip` | Blueprint Consultation booking page (`?v=b`, `?v=c` for variants B and C) |
-| `/sip/confirmation`, `/sip/intake`, `/sip/privacy`, `/sip/terms`, `/sip/refund`, `/sip/contact` | Booking sub-pages |
-| `/api/book/*` | Booking APIs (Razorpay webhook: `/api/book/webhook`) |
+| `/sip` | Blueprint Consultation booking page, free, times booked through an embedded Calendly calendar (`?v=b`, `?v=c` for variants B and C) |
+| `/sip/intake`, `/sip/privacy`, `/sip/terms`, `/sip/contact` | Booking sub-pages |
+| `/api/book/*` | Booking APIs (lead, Calendly booking, status, health, admin) |
 | `/book/*` | Temporary redirect to the matching `/sip` page |
 
 ## As deployed (2026-11-09)
@@ -49,9 +49,10 @@ Edit `/var/www/env/hls-prod.env` on the app machine, then GitHub → Actions →
 HLS website → Run workflow. A plain `pm2 reload` is not enough for `NEXT_PUBLIC_*`
 values.
 
-Still to fill in that file: the 4 Razorpay values (then create the webhook,
-`https://<domain>/api/book/webhook`, events listed in `.env`), legal entity name,
-support contacts, consultant name, consultation length and mode, owner alert email.
+Still to fill in that file: `NEXT_PUBLIC_CALENDLY_URL` (the Calendly booking link;
+until then step 3 says "booking opens soon"), optionally `CALENDLY_API_TOKEN` (saves
+the booked time on each lead), legal entity name, support contacts, consultant name,
+consultation length and mode, owner alert email.
 
 ## Redis without Docker
 
@@ -82,6 +83,5 @@ Back up `/var/lib/redis-hls` (it holds every lead and booking).
    before touching DNS.
 3. DNS at the client's provider: `A @` and `A www` → `187.127.145.209`, then certbot
    (runbook 5.10).
-4. Run the workflow. Update the Razorpay webhook URL and the site address registered
-   in Razorpay.
+4. Run the workflow.
 5. `app/sitemap.js` already says `https://himlifeschool.com/`.

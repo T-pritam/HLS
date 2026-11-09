@@ -1,7 +1,6 @@
 import Todo from './Todo';
 import BookPhoto from './BookPhoto';
 import { hasContact } from './Contact';
-import { Inr } from './format';
 import { approvedTestimonials, mentor, mentorReady } from '@/lib/book/content';
 
 /* ------------------------------------------------------------------ */
@@ -337,7 +336,7 @@ export function Example({ cfg }) {
 /* ------------------------------------------------------------------ */
 
 const STEPS = [
-  ['Book and pay', 'Confirm you are a Group 1 repeater, choose a slot and pay for the consultation.'],
+  ['Book your slot', 'Confirm you are a Group 1 repeater, give your details and choose a time. It is free.'],
   ['Share your papers privately', 'You receive a private link for your marksheets and mock papers.'],
   ['The consultation', 'A one-to-one conversation about your attempt.'],
   ['Your blueprint', 'Where you stand, the gaps, your priorities and a realistic next-step plan, in writing.'],
@@ -516,7 +515,7 @@ export function Pricing({ cfg }) {
         <div className="lg:sticky lg:top-28">
           <SectionHead kicker="Price" id="pricing-title" title="Start with a clear diagnosis." />
           <p className="lede mt-6">
-            One payment for the consultation and your written blueprint. Nothing else is sold on this page.
+            A free consultation and your written blueprint. Nothing is sold on this page.
           </p>
         </div>
         <div className="card p-6 shadow-[0_24px_48px_-32px_rgba(16,32,48,0.35)] sm:p-8 md:p-10">
@@ -527,10 +526,9 @@ export function Pricing({ cfg }) {
             </div>
             <div className="sm:text-right">
               <p className="font-display text-[30px] leading-none md:text-[36px]">
-                <Inr amount={cfg.priceInr} />
+                Free
               </p>
-              <p className="mt-2 text-[15px] text-hls-muted">{cfg.taxLabel}</p>
-              <p className="text-[15px] text-hls-muted">One-time payment</p>
+              <p className="mt-2 text-[15px] text-hls-muted">No payment needed</p>
             </div>
           </div>
           <CheckList items={INCLUDED} className="mt-8 space-y-3 border-t border-hls-line pt-8" />
@@ -571,30 +569,12 @@ export function Pricing({ cfg }) {
 /* 12. FAQ                                                             */
 /* ------------------------------------------------------------------ */
 
-function refundAnswer(cfg) {
-  if (!cfg.policyPublished) {
-    return (
-      <>
-        <p>Cancellation, reschedule and refund terms are to be confirmed.</p>
-        {hasContact(cfg) && <p className="mt-2">If you have a question before booking, please contact support.</p>}
-      </>
-    );
-  }
+function attendAnswer() {
   return (
-    <>
-      <p>
-        If you cancel at least 24 hours before your slot, you get a full refund. Inside 24 hours there is no
-        automatic refund. You can reschedule once, free, with at least 24 hours&rsquo; notice. If we have to cancel,
-        you can choose a new slot or a full refund. A missed consultation is not refunded automatically, but
-        support reviews exceptions.
-      </p>
-      <p className="mt-2">
-        {cfg.refundProcessingTime
-          ? `Refunds are processed within ${cfg.refundProcessingTime}.`
-          : 'Refund processing time is to be confirmed.'}{' '}
-        <a href="/sip/refund">Read the refund and cancellation policy</a>.
-      </p>
-    </>
+    <p>
+      Use the reschedule or cancel link in your Calendly confirmation email, so the time can go to another student.
+      The consultation is free, so there is nothing to refund.
+    </p>
   );
 }
 
@@ -650,7 +630,7 @@ export function faqItems(cfg) {
         {length} {blueprint}
       </p>,
     ],
-    ['What if I can’t attend or want a refund?', <div key="a">{refundAnswer(cfg)}</div>],
+    ['What if I can’t attend?', <div key="a">{attendAnswer()}</div>],
     [
       'What does the programme cost?',
       <p key="a">A counsellor shares the cost on a call, if the programme fits you after your consultation.</p>,

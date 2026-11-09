@@ -5,7 +5,6 @@ import Todo from './Todo';
 const LINKS = [
   { href: '/sip/privacy', label: 'Privacy Notice' },
   { href: '/sip/terms', label: 'Terms of Use' },
-  { href: '/sip/refund', label: 'Refund and Cancellation' },
   { href: '/sip/contact', label: 'Contact' },
 ];
 
@@ -53,7 +52,7 @@ export default function Footer({ cfg }) {
         )}
 
         <p className="mt-8 border-t border-white/10 pt-6 text-[13px] text-hls-mist">
-          Payments are processed securely by Razorpay. You share your papers through a private link after booking.
+          Times are booked through Calendly. You share your papers through a private link after booking.
         </p>
       </div>
     </footer>
