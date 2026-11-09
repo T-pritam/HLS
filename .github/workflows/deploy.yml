@@ -1,0 +1,156 @@
+name: Deploy HLS website
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+# One deploy at a time. A second push waits for the running deploy to finish.
+concurrency:
+  group: deploy-hls
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Wait for SSH to be reachable
+        uses: nick-fields/retry@v3
+        with:
+          timeout_seconds: 10
+          max_attempts: 5
+          retry_wait_seconds: 8
+          command: nc -zv ${{ secrets.SSH_HOST }} ${{ secrets.SSH_PORT }}
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          timeout: 60s
+          command_timeout: 15m
+          script: |
+            set -e
+
+            echo "===== HLS DEPLOY START ====="
+
+            # ---- Config ----
+            APP_NAME="hls"
+            PORT=3008
+            REPO_URL="https://github.com/T-pritam/HLS.git"
+            BRANCH="master"
+            REPO_DIR="/var/www/hls-repo"
+            RELEASES_DIR="/var/www/hls-releases"
+            CURRENT_LINK="/var/www/hls-current"
+            ENV_FILE="/var/www/env/hls-prod.env"
+            RELEASE="$RELEASES_DIR/$(date +%Y%m%d%H%M%S)"
+            KEEP_RELEASES=3
+            HEALTH_URL="http://127.0.0.1:$PORT/api/book/health"
+
+            # ---- Ensure base dirs exist ----
+            mkdir -p "$RELEASES_DIR"
+
+            # If anything fails before the swap, remove the half-made release folder.
+            SWAPPED=0
+            trap 'if [ "$SWAPPED" != "1" ]; then echo "!!! Failed before swap, live site untouched. Removing $RELEASE"; rm -rf "$RELEASE"; fi' EXIT
+
+            # ---- Pull latest code ----
+            if [ ! -d "$REPO_DIR/.git" ]; then
+              echo ">>> First deploy: cloning repo..."
+              rm -rf "$REPO_DIR"
+              git clone --branch "$BRANCH" "$REPO_URL" "$REPO_DIR"
+            else
+              echo ">>> Pulling latest code..."
+              cd "$REPO_DIR"
+              git fetch --all --prune
+              git reset --hard "origin/$BRANCH"
+              git clean -fd
+            fi
+            echo ">>> Commit: $(git -C "$REPO_DIR" log -1 --format='%h %s')"
+
+            # ---- Copy code into a new timestamped release folder ----
+            echo ">>> Creating release: $RELEASE"
+            rsync -a --exclude .git "$REPO_DIR/" "$RELEASE/"
+
+            # ---- Copy prod env into release ----
+            # Must be in place BEFORE the build: NEXT_PUBLIC_* values are baked in at build time.
+            echo ">>> Copying env..."
+            cp "$ENV_FILE" "$RELEASE/.env.local"
+            chmod 600 "$RELEASE/.env.local"
+
+            # ---- Install dependencies ----
+            # If package-lock.json is unchanged, hard-link node_modules from the previous
+            # release instead of running npm ci. Dev deps are needed for the build.
+            PREV_RELEASE=$(readlink "$CURRENT_LINK" 2>/dev/null || true)
+            cd "$RELEASE"
+            if [ -n "$PREV_RELEASE" ] && [ -d "$PREV_RELEASE/node_modules" ] && \
+               diff -q "$PREV_RELEASE/package-lock.json" "$RELEASE/package-lock.json" > /dev/null 2>&1; then
+              echo ">>> Lockfile unchanged: hard-linking node_modules from previous release..."
+              # -a (not -r) keeps the node_modules/.bin symlinks, which next build needs.
+              cp -al "$PREV_RELEASE/node_modules" "$RELEASE/node_modules"
+            else
+              echo ">>> Lockfile changed (or first deploy): running npm ci..."
+              npm ci --include=dev
+            fi
+
+            # ---- Build ----
+            # Runs in the new release folder while the previous release keeps serving.
+            # A failed build stops here (set -e) and the live site is untouched.
+            echo ">>> Building..."
+            npm run build
+
+            # ---- Atomic symlink swap ----
+            echo ">>> Swapping to new release..."
+            ln -sfn "$RELEASE" "$CURRENT_LINK.new"
+            mv -Tf "$CURRENT_LINK.new" "$CURRENT_LINK"
+            SWAPPED=1
+
+            # ---- Zero-downtime reload ----
+            # Cluster mode x2: pm2 reload replaces the instances one at a time, so one is
+            # always serving. Both share leads through Redis (LEAD_STORE=redis), never
+            # through local files. 0.0.0.0 because the front machine proxies to this port.
+            echo ">>> Reloading PM2..."
+            if pm2 describe "$APP_NAME" > /dev/null 2>&1; then
+              pm2 reload "$APP_NAME" --update-env
+            else
+              pm2 start "$CURRENT_LINK/node_modules/next/dist/bin/next" \
+                --name "$APP_NAME" \
+                --cwd "$CURRENT_LINK" \
+                -i 2 \
+                -- start -p "$PORT" -H 0.0.0.0
+            fi
+
+            # ---- Health check, roll back if the new release does not answer ----
+            # /api/book/health must answer and report the Redis store.
+            echo ">>> Health check..."
+            HEALTHY=0
+            for i in $(seq 1 15); do
+              if curl -fsS --max-time 5 "$HEALTH_URL" 2>/dev/null | grep -q '"store":"redis"' && \
+                 curl -fsS -o /dev/null --max-time 10 "http://127.0.0.1:$PORT/"; then
+                HEALTHY=1
+                break
+              fi
+              sleep 2
+            done
+
+            if [ "$HEALTHY" != "1" ]; then
+              echo "!!! Health check failed"
+              if [ -n "$PREV_RELEASE" ] && [ -d "$PREV_RELEASE" ]; then
+                echo "!!! Rolling back to $PREV_RELEASE"
+                ln -sfn "$PREV_RELEASE" "$CURRENT_LINK.new"
+                mv -Tf "$CURRENT_LINK.new" "$CURRENT_LINK"
+                pm2 reload "$APP_NAME" --update-env
+              fi
+              exit 1
+            fi
+            pm2 save
+
+            # ---- Cleanup old releases ----
+            echo ">>> Cleaning up old releases (keeping last $KEEP_RELEASES)..."
+            ls -dt "$RELEASES_DIR"/* | tail -n +$((KEEP_RELEASES + 1)) | xargs -r rm -rf
+
+            echo "===== HLS DEPLOY DONE: Release $RELEASE ====="

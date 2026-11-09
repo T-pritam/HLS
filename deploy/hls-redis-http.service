@@ -1,0 +1,16 @@
+[Unit]
+Description=Upstash-style REST API for the HLS Redis (127.0.0.1:8079 -> 6380)
+After=network.target redis-hls.service
+Requires=redis-hls.service
+
+[Service]
+EnvironmentFile=/opt/hls-redis/.env
+Environment=REDIS_PORT=6380 LISTEN_PORT=8079 LISTEN_HOST=127.0.0.1
+ExecStart=/usr/bin/node /opt/hls-redis/redis-http.mjs
+Restart=always
+RestartSec=2
+User=nobody
+Group=nogroup
+
+[Install]
+WantedBy=multi-user.target
