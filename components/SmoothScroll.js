@@ -46,15 +46,21 @@ export default function SmoothScroll() {
     const resize = () => lenis.resize();
     ScrollTrigger.addEventListener('refresh', resize);
 
-    const refresh = () => ScrollTrigger.refresh();
-    window.addEventListener('load', refresh);
-    // Swapped-in webfonts reflow the copy that unpinned triggers measure.
-    document.fonts?.ready.then(refresh);
-    ScrollTrigger.refresh();
+    // One refresh, once the webfonts have swapped in and the images have
+    // loaded, both of which reflow what the triggers measure. Triggers
+    // measure themselves as they are created, so nothing is needed sooner.
+    let cancelled = false;
+    const loaded = new Promise((resolve) => {
+      if (document.readyState === 'complete') resolve();
+      else window.addEventListener('load', resolve, { once: true });
+    });
+    Promise.all([document.fonts?.ready, loaded]).then(() => {
+      if (!cancelled) ScrollTrigger.refresh();
+    });
 
     return () => {
+      cancelled = true;
       ScrollTrigger.removeEventListener('refresh', resize);
-      window.removeEventListener('load', refresh);
       gsap.ticker.remove(raf);
       lenis.destroy();
       delete window.__lenis;

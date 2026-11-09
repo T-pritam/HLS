@@ -1,0 +1,9 @@
+# Kept in the project, never deployed.
+_unused-assets
+*.pdf
+HIM LIFE SCHOOL*.svg
+His Logo*.png
+# Unused creative zips in public/: kept locally, not published.
+public/photos/*.zip
+# Local secrets (the CLI writes a token here).
+.env*.local

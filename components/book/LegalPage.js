@@ -5,14 +5,14 @@ import Footer from './Footer';
 export default function LegalPage({ cfg, title, children }) {
   return (
     <>
-      <Header ctaHref="/book#book" />
+      <Header ctaHref="/sip#book" />
       <main id="main" className="section">
         <div className="wrap">
           <p className="label text-hls-signal-dark">HIM LIFE SCHOOL · Blueprint Consultation</p>
           <h1 className="mt-4 text-[38px] leading-tight md:text-[52px]">{title}</h1>
           <div className="prose-legal mt-8">{children}</div>
           <p className="mt-12">
-            <a href="/book">Back to the Blueprint Consultation</a>
+            <a href="/sip">Back to the Blueprint Consultation</a>
           </p>
         </div>
       </main>

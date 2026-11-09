@@ -200,7 +200,7 @@ export default function Booking({ variant, priceInr, taxLabel, paymentMode, slot
   }, []);
 
   const confirmationUrl = useCallback(
-    (l) => `/book/confirmation?lead=${encodeURIComponent(l.leadId)}&t=${encodeURIComponent(l.token)}`,
+    (l) => `/sip/confirmation?lead=${encodeURIComponent(l.leadId)}&t=${encodeURIComponent(l.token)}`,
     [],
   );
 
@@ -611,7 +611,7 @@ export default function Booking({ variant, priceInr, taxLabel, paymentMode, slot
                 />
                 <span>
                   I have read the{' '}
-                  <a href="/book/privacy" target="_blank" rel="noopener">
+                  <a href="/sip/privacy" target="_blank" rel="noopener">
                     privacy notice
                   </a>{' '}
                   and agree to my details being used to book and run this consultation. (Required)

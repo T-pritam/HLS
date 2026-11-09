@@ -25,7 +25,7 @@ less with the region settings below.
 
 What Razorpay does is unchanged. After a payment its own screens ("Confirming
 Payment", then "Payment Successful, redirecting in 5 seconds") take about 10
-seconds in test mode. Meanwhile `/book` now says "Finish paying in the Razorpay
+seconds in test mode. Meanwhile `/sip` now says "Finish paying in the Razorpay
 window", then "Payment received. Confirming your booking…", instead of showing
 the Pay button again.
 

@@ -12,7 +12,11 @@ const PRIORITY = 2;
 /** Where the flood starts, roughly where the spark sat a screen ago. */
 const ORIGIN = '50% 42%';
 
-export default function Teacher() {
+/**
+ * `body` replaces the line under the name; the home page passes the story's
+ * words. Without it the scene shows its original one-line introduction.
+ */
+export default function Teacher({ body = null }) {
   const section = useRef(null);
   const blue = useRef(null);
   const platinum = useRef(null);
@@ -111,6 +115,17 @@ export default function Teacher() {
           // Texture, not a photograph. Blurred so no face or gown reads.
           style={{ opacity: 0.05, filter: 'grayscale(100%) blur(3px)' }}
         />
+        {/* Ruled paper: a hairline every 32px and a double margin rule. */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0"
+          style={{
+            backgroundImage: [
+              'linear-gradient(to right, transparent calc(7% - 1px), rgba(18,115,194,0.14) calc(7% - 1px), rgba(18,115,194,0.14) 7%, transparent 7%, transparent calc(7% + 5px), rgba(18,115,194,0.14) calc(7% + 5px), rgba(18,115,194,0.14) calc(7% + 6px), transparent calc(7% + 6px))',
+              'repeating-linear-gradient(to bottom, transparent 0, transparent 31px, rgba(16,32,48,0.07) 31px, rgba(16,32,48,0.07) 32px)',
+            ].join(', '),
+          }}
+        />
       </div>
 
       <div className="rm-pad relative mx-auto flex h-full w-full max-w-[1600px] flex-col justify-center gap-[clamp(28px,5vh,48px)] px-5 pt-[72px] text-hls-navy md:grid md:grid-cols-12 md:items-center md:gap-12 md:px-10 md:pt-[84px]">
@@ -137,12 +152,18 @@ export default function Teacher() {
               className="display text-[clamp(38px,min(4.6vw,8.5vh),76px)] leading-[1.02] [text-wrap:balance]"
             />
           </div>
-          <p
-            ref={line}
-            className="mt-[clamp(16px,3vh,32px)] max-w-[30ch] font-body text-[clamp(17px,1.5vw,22px)] leading-[1.5] text-hls-navy/75"
-          >
-            Built HIM LIFE SCHOOL for students who knew the syllabus and still lost the marks.
-          </p>
+          {body ? (
+            <div ref={line} className="mt-[clamp(12px,2.4vh,28px)]">
+              {body}
+            </div>
+          ) : (
+            <p
+              ref={line}
+              className="mt-[clamp(16px,3vh,32px)] max-w-[30ch] font-body text-[clamp(17px,1.5vw,22px)] leading-[1.5] text-hls-navy/75"
+            >
+              Built HIM LIFE SCHOOL for students who knew the syllabus and still lost the marks.
+            </p>
+          )}
         </div>
       </div>
     </section>

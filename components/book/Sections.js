@@ -592,7 +592,7 @@ function refundAnswer(cfg) {
         {cfg.refundProcessingTime
           ? `Refunds are processed within ${cfg.refundProcessingTime}.`
           : 'Refund processing time is to be confirmed.'}{' '}
-        <a href="/book/refund">Read the refund and cancellation policy</a>.
+        <a href="/sip/refund">Read the refund and cancellation policy</a>.
       </p>
     </>
   );

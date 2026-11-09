@@ -28,8 +28,8 @@ import { VARIANTS } from '@/lib/book/attempts';
  * B (proof-led) needs an approved sample blueprint; without one it falls back
  * to A, and the lead records the variant actually shown.
  *
- * Each variant is a static page: /book is A, and next.config.mjs rewrites
- * /book?v=b and /book?v=c to /book/v/b and /book/v/c.
+ * Each variant is a static page: /sip is A, and next.config.mjs rewrites
+ * /sip?v=b and /sip?v=c to /sip/v/b and /sip/v/c.
  */
 const REST = ['next', 'programme', 'mentor', 'proof', 'pricing', 'faq'];
 const ORDER = {
