@@ -1,13 +1,14 @@
 import { CREDENTIAL_LINE, TESTIMONIALS } from '@/lib/story-facts';
 
-const PLACEHOLDERS = process.env.NEXT_PUBLIC_SHOW_PLACEHOLDERS === 'true';
+// Internal placeholders never reach a production build, whatever the env says.
+const PLACEHOLDERS = process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_SHOW_PLACEHOLDERS === 'true';
 
 const BOX = 'rounded-[4px] border border-dashed border-hls-mist/50 px-5 py-4 font-mono text-[12px] tracking-[0.06em] text-hls-mist';
 
 /*
  * A slim strip of proof after the founder scene: the credential line and up
- * to two student quotes, only when lib/story-facts.js has real ones. For the
- * approval preview, empty ones show as dashed placeholders instead.
+ * to two student quotes, only when lib/story-facts.js has real ones. In local
+ * development, empty ones can show as dashed placeholders instead.
  */
 export default function StoryProof() {
   const quotes = TESTIMONIALS.filter((t) => t && t.quote && t.name).slice(0, 2);
