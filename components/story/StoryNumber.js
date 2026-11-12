@@ -67,6 +67,7 @@ export default function StoryNumber() {
   useEffect(() => {
     const gsap = initGsap();
     if (!SHOW_STAT || reducedMotion()) return;
+    const digitsEl = digits.current;
 
     const ctx = gsap.context(() => {
       const lit = [...grid.current.querySelectorAll('[data-lit]')].sort(
@@ -145,7 +146,7 @@ export default function StoryNumber() {
 
     return () => {
       ctx.revert();
-      if (digits.current) digits.current.textContent = String(FIGURE);
+      if (digitsEl) digitsEl.textContent = String(FIGURE);
     };
   }, []);
 
