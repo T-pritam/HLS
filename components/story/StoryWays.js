@@ -5,7 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import WordReveal, { toWords } from '@/components/WordReveal';
 import MagnetLink from '@/components/ui/MagnetLink';
 import { OUTLINE, OutlineArrow } from '@/components/ui/PillLink';
-import { initGsap, LANDING_URL, onResize, pinLength, reducedMotion, refreshSoon } from '@/lib/motion';
+import { initGsap, LANDING_URL, onResize, pinLength, staticScenes, refreshSoon } from '@/lib/motion';
 
 const CONSULTATION = 'THE BLUEPRINT CONSULTATION';
 const PROGRAMME = 'THE SCORE IMPROVEMENT PROGRAMME';
@@ -52,7 +52,7 @@ export default function StoryWays() {
 
   useEffect(() => {
     const gsap = initGsap();
-    if (reducedMotion()) return;
+    if (staticScenes()) return;
 
     let ctx;
     const build = () => {

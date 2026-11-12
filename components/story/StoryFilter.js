@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { initGsap, onResize, pinLength, reducedMotion, refreshSoon } from '@/lib/motion';
+import { initGsap, onResize, pinLength, staticScenes, refreshSoon } from '@/lib/motion';
 import SignalStrands from './SignalStrands';
 import StoryCta from './StoryCta';
 
@@ -78,7 +78,7 @@ export default function StoryFilter() {
 
   useEffect(() => {
     const gsap = initGsap();
-    const still = reducedMotion();
+    const still = staticScenes();
     let shownOnce = false;
 
     let ctx;
@@ -278,7 +278,7 @@ export default function StoryFilter() {
         id="story-filter"
         className="story-filter relative isolate h-[100svh] w-full overflow-hidden bg-hls-black"
       >
-        <div ref={captions} className="absolute inset-x-5 top-[92px] grid md:inset-x-10 lg:inset-x-[var(--frame-l)] lg:top-[108px]">
+        <div ref={captions} data-captions className="absolute inset-x-5 top-[92px] grid md:inset-x-10 lg:inset-x-[var(--frame-l)] lg:top-[108px]">
           {CAPTIONS.map((c) => (
             <p key={c} className={`col-start-1 row-start-1 max-w-[13em] ${CAPTION}`}>
               {c}
@@ -296,6 +296,7 @@ export default function StoryFilter() {
 
         <div
           ref={head}
+          data-head
           className="absolute aspect-square -translate-x-1/2 -translate-y-1/2 mix-blend-screen lg:left-[76%] lg:top-1/2 lg:h-[min(70svh,40vw)] max-lg:left-1/2 max-lg:top-[76%] max-lg:h-[min(40svh,70vw)]"
         >
           <Image
@@ -331,8 +332,8 @@ export default function StoryFilter() {
         </div>
 
         {/* The one way forward: the middle of the stage, where the chips were. */}
-        <div ref={ctaBand} className="pointer-events-none absolute inset-y-0 left-0 right-0 z-10 flex items-center justify-center px-5 lg:right-[38%]">
-          <div ref={cta} className="pointer-events-auto invisible opacity-0 motion-reduce:visible motion-reduce:opacity-100">
+        <div ref={ctaBand} data-cta-band className="pointer-events-none absolute inset-y-0 left-0 right-0 z-10 flex items-center justify-center px-5 lg:right-[38%]">
+          <div ref={cta} className="rm-cta pointer-events-auto invisible opacity-0">
             <StoryCta primary onClick={() => track('story_cta_clicked')} />
           </div>
         </div>

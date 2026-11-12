@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { initGsap, pinLength, reducedMotion } from '@/lib/motion';
+import { initGsap, pinLength, staticScenes } from '@/lib/motion';
 import { SHOW_STAT, STAT_LABEL, STAT_VALUE } from '@/lib/story-facts';
 
 /** How many of the hundred desks light: the percentage, rounded. */
@@ -66,7 +66,7 @@ export default function StoryNumber() {
 
   useEffect(() => {
     const gsap = initGsap();
-    if (!SHOW_STAT || reducedMotion()) return;
+    if (!SHOW_STAT || staticScenes()) return;
     const digitsEl = digits.current;
 
     const ctx = gsap.context(() => {

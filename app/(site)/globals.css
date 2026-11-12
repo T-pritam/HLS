@@ -298,4 +298,75 @@ html.lenis body {
   .cursor-ring {
     display: none;
   }
+
+  .rm-cta {
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Phones held sideways (static-story, set before first paint by the
+   layout's head script). Under 500px tall the pinned scenes can't hold
+   their content, so they unfold into the same stacked documents as
+   reduced motion. The rest of the page keeps its motion.
+   --------------------------------------------------------------- */
+
+html.static-story .js-word-inner {
+  transform: none !important;
+}
+
+html.static-story .rm-flow {
+  position: static !important;
+  height: auto !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+}
+
+html.static-story .rm-pad {
+  padding-top: 5rem !important;
+  padding-bottom: 5rem !important;
+}
+
+html.static-story .rm-hide {
+  display: none !important;
+}
+
+html.static-story .rm-show {
+  display: block !important;
+}
+
+html.static-story .rm-cta {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* The hero's 520px floor would push the headline below a 360px screen. */
+html.static-story #story-hero {
+  min-height: 0;
+}
+
+html.static-story #teacher {
+  height: auto;
+}
+
+/* The filter keeps its caption and button, stacked; the head has no room
+   beside them. */
+html.static-story #story-filter {
+  height: auto;
+  padding: 5rem 0;
+}
+
+html.static-story #story-filter [data-head] {
+  display: none;
+}
+
+html.static-story #story-filter [data-captions],
+html.static-story #story-filter [data-cta-band] {
+  position: static;
+}
+
+html.static-story #story-filter [data-cta-band] {
+  margin-top: 2rem;
+  justify-content: flex-start;
 }

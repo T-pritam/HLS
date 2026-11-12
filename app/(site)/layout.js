@@ -53,14 +53,18 @@ export default function RootLayout({ children }) {
     <html
       lang="en"
       className={`${fraunces.variable} ${hanken.variable} ${plexMono.variable}`}
+      // The head script may add static-story before React hydrates.
+      suppressHydrationWarning
     >
       <head>
         {/* Runs before first paint. Browser scroll restoration would drop the
-            visitor into the middle of a pinned timeline on reload. */}
+            visitor into the middle of a pinned timeline on reload. A phone
+            held sideways gets the static scenes (lib/motion.js staticScenes). */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "if('scrollRestoration' in history){history.scrollRestoration='manual';}window.scrollTo(0,0);",
+              "if('scrollRestoration' in history){history.scrollRestoration='manual';}window.scrollTo(0,0);" +
+              "if(matchMedia('(orientation: landscape) and (max-height: 500px) and (pointer: coarse)').matches){document.documentElement.classList.add('static-story');}",
           }}
         />
 

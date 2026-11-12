@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { initGsap, reducedMotion } from '@/lib/motion';
+import { initGsap, staticScenes } from '@/lib/motion';
 import { LAMP } from './LampGlow';
 
 /**
@@ -18,7 +18,7 @@ export default function StoryLampFlood() {
 
   useEffect(() => {
     const gsap = initGsap();
-    if (reducedMotion()) return;
+    if (staticScenes()) return;
 
     const el = root.current;
     const teacher = document.getElementById('teacher');

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import Photo from '@/components/Photo';
-import { initGsap, pinLength, reducedMotion } from '@/lib/motion';
+import { initGsap, pinLength, staticScenes } from '@/lib/motion';
 import { HallSheet, Marksheet } from './DeskObjects';
 import LampGlow from './LampGlow';
 
@@ -34,7 +34,7 @@ export default function StoryMoments() {
 
   useEffect(() => {
     const gsap = initGsap();
-    if (reducedMotion()) return;
+    if (staticScenes()) return;
 
     const ctx = gsap.context(() => {
       const caps = [...captions.current.children];
