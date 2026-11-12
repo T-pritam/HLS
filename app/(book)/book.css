@@ -232,8 +232,12 @@
     transition: background-color 150ms ease;
   }
 
-  .btn-primary:hover {
-    background-color: var(--color-hls-signal-dark);
+  /* Hover colours only where there is a pointer to hover with; on touch
+     screens they would stick after a tap. */
+  @media (hover: hover) {
+    .btn-primary:hover {
+      background-color: var(--color-hls-signal-dark);
+    }
   }
 
   .btn-primary:disabled {
@@ -257,8 +261,10 @@
     text-decoration: none;
   }
 
-  .btn-secondary:hover {
-    border-color: var(--color-hls-steel);
+  @media (hover: hover) {
+    .btn-secondary:hover {
+      border-color: var(--color-hls-steel);
+    }
   }
 
   .field {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Logo from './Logo';
 
 /**
@@ -9,16 +9,31 @@ import Logo from './Logo';
  */
 export default function Header({ ctaHref = '#book', showCta = true, links = [] }) {
   const [open, setOpen] = useState(false);
+  const header = useRef(null);
+  const toggle = useRef(null);
 
+  // Escape closes the menu and hands focus back to its button; a tap
+  // anywhere outside the header closes it too.
   useEffect(() => {
     if (!open) return;
-    const close = (e) => e.key === 'Escape' && setOpen(false);
-    window.addEventListener('keydown', close);
-    return () => window.removeEventListener('keydown', close);
+    const onKey = (e) => {
+      if (e.key !== 'Escape') return;
+      setOpen(false);
+      toggle.current?.focus();
+    };
+    const onPointer = (e) => {
+      if (!header.current?.contains(e.target)) setOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    document.addEventListener('pointerdown', onPointer);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.removeEventListener('pointerdown', onPointer);
+    };
   }, [open]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-hls-line bg-white/90 backdrop-blur">
+    <header ref={header} className="sticky top-0 z-40 border-b border-hls-line bg-white/90 backdrop-blur">
       <div className="wrap flex min-h-16 items-center justify-between gap-4 py-1.5">
         <a href="/sip" className="-m-2 block p-2" aria-label="HIM LIFE SCHOOL, Blueprint Consultation">
           <Logo tone="light" priority className="block w-[104px] sm:w-[120px] [&_img]:w-full" />
@@ -26,7 +41,7 @@ export default function Header({ ctaHref = '#book', showCta = true, links = [] }
 
         <nav aria-label="Page" className="hidden items-center gap-6 md:flex lg:gap-8">
           {links.map((l) => (
-            <a key={l.href} href={l.href} className="text-[15px] text-hls-muted no-underline hover:text-hls-ink">
+            <a key={l.href} href={l.href} className="inline-flex min-h-11 items-center text-[15px] text-hls-muted no-underline hover:text-hls-ink">
               {l.label}
             </a>
           ))}
@@ -39,6 +54,7 @@ export default function Header({ ctaHref = '#book', showCta = true, links = [] }
 
         {(links.length > 0 || showCta) && (
           <button
+            ref={toggle}
             type="button"
             className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-hls-line text-hls-ink md:hidden"
             aria-label={open ? 'Close menu' : 'Open menu'}

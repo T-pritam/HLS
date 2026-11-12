@@ -12,7 +12,9 @@ export default function LegalPage({ cfg, title, children }) {
           <h1 className="mt-4 text-[38px] leading-tight md:text-[52px]">{title}</h1>
           <div className="prose-legal mt-8">{children}</div>
           <p className="mt-12">
-            <a href="/sip">Back to the Blueprint Consultation</a>
+            <a href="/sip" className="inline-flex min-h-11 items-center">
+              Back to the Blueprint Consultation
+            </a>
           </p>
         </div>
       </main>
