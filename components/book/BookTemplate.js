@@ -92,7 +92,7 @@ export default function BookTemplate({ requested = 'a' }) {
               <p className="lede mx-auto mt-5">
                 Find where your marks are breaking, and leave with a written blueprint for what to do next.
               </p>
-              <p className="mt-6 font-display text-[24px] leading-tight md:text-[28px]">
+              <p className="mt-6 font-display text-[clamp(24px,calc(20.183px+1.018vw),28px)] leading-tight">
                 Free <span className="text-hls-muted">· one-to-one consultation</span>
               </p>
               <ol className="mt-8 flex flex-col items-center gap-3 text-[15px] sm:flex-row sm:justify-center sm:gap-6">

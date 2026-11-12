@@ -200,7 +200,7 @@ export default function StoryNumber() {
               <span className="text-[0.55em] text-hls-signal">{UNIT}</span>
             </span>
           </p>
-          <p data-rise className="mt-4 font-mono text-[13px] uppercase leading-[1.6] tracking-[0.12em] text-hls-mist lg:mt-6 lg:text-[14px] lg:tracking-[0.14em]">
+          <p data-rise className="mt-4 font-mono text-[clamp(13px,calc(12.422px+0.154vw),14px)] uppercase leading-[1.6] tracking-[0.12em] text-hls-mist lg:mt-6 lg:tracking-[0.14em]">
             <span className="block">{LABEL_HEAD}</span>
             {LABEL_REST.length ? <span className="block">{LABEL_REST.join(' · ')}</span> : null}
           </p>

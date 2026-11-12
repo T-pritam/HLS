@@ -242,7 +242,7 @@ export default function StoryMarks() {
           <h2 className="max-w-[18em] font-display text-[clamp(26px,3.2vw,42px)] leading-[1.12] tracking-[-0.015em] text-hls-platinum [text-wrap:balance]">
             {COPY.intro.heading}
           </h2>
-          <p className="mt-3 max-w-[46ch] font-body text-[16px] leading-[1.5] text-hls-platinum/85 md:text-[17px]">
+          <p className="mt-3 max-w-[46ch] font-body text-[clamp(16px,calc(15.046px+0.254vw),17px)] leading-[1.5] text-hls-platinum/85">
             {COPY.intro.lead}
           </p>
           <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.14em] text-hls-mist">{COPY.intro.small}</p>
@@ -370,7 +370,7 @@ export default function StoryMarks() {
                   <p className="font-display text-[clamp(24px,2.6vw,34px)] leading-[1.15] tracking-[-0.01em] text-hls-platinum">
                     {verdict.head}
                   </p>
-                  <p className="mt-4 font-body text-[15px] leading-[1.6] text-hls-platinum/80 md:text-[16px]">{verdict.body}</p>
+                  <p className="mt-4 font-body text-[clamp(15px,calc(14.046px+0.254vw),16px)] leading-[1.6] text-hls-platinum/80">{verdict.body}</p>
                 </div>
               ) : (
                 <p className="font-body text-[15px] leading-[1.6] text-hls-mist">{COPY.panelEmpty}</p>
@@ -379,7 +379,7 @@ export default function StoryMarks() {
 
             {verdict ? (
               <div className="mt-8 border-t border-hls-mist/20 pt-6">
-                <p className="font-body text-[15px] text-hls-platinum md:text-[16px]">{COPY.followup.prompt}</p>
+                <p className="font-body text-[clamp(15px,calc(14.046px+0.254vw),16px)] text-hls-platinum">{COPY.followup.prompt}</p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {COPY.followup.chips.map((c, i) => (
                     <button
@@ -409,7 +409,7 @@ export default function StoryMarks() {
           <h3 className="font-display text-[clamp(28px,3.6vw,48px)] leading-[1.1] tracking-[-0.015em] text-hls-platinum">
             {COPY.bridge.head}
           </h3>
-          <p className="mt-4 font-body text-[15px] leading-[1.6] text-hls-mist md:text-[17px]">{COPY.bridge.body}</p>
+          <p className="mt-4 font-body text-[clamp(15px,calc(13.092px+0.509vw),17px)] leading-[1.6] text-hls-mist">{COPY.bridge.body}</p>
           {/* Only once a first read is on screen. The link never carries the marks. */}
           {verdict ? <StoryCta label={MARKS_CTA_LABEL} align="start" onClick={() => track('marks_cta_clicked')} className="mt-8" /> : null}
         </div>

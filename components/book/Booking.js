@@ -151,7 +151,7 @@ function Field({ id, label, hint, error, children }) {
 
 function StepTitle({ n, children, titleRef }) {
   return (
-    <h3 ref={titleRef} tabIndex={-1} className="text-[26px] leading-tight outline-none md:text-[30px]">
+    <h3 ref={titleRef} tabIndex={-1} className="text-[clamp(26px,calc(22.183px+1.018vw),30px)] leading-tight outline-none">
       {n && <span className="label mb-2 block text-hls-signal-dark">Step {n} of 3</span>}
       {children}
     </h3>

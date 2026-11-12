@@ -14,7 +14,7 @@ const COVERS = ['Where you stand', 'The specific gaps', 'Your priorities', 'A re
 function PriceLine({ cfg }) {
   return (
     <div className="mt-8">
-      <p className="font-display text-[30px] leading-none md:text-[36px]">
+      <p className="font-display text-[clamp(30px,calc(24.275px+1.527vw),36px)] leading-none">
         Free
       </p>
       <p className="mt-2 text-[15px] text-hls-muted">No payment needed · One-to-one consultation</p>

@@ -48,7 +48,7 @@ export default function StoryFooter() {
                   className="group inline-flex min-h-[44px] max-w-full items-center gap-2.5 text-hls-platinum transition-colors duration-200 hover:text-white"
                 >
                   <Icon className="text-hls-platinum/80 transition-colors duration-200 group-hover:text-hls-signal group-focus-visible:text-hls-signal" />
-                  <span className="min-w-0 text-[11px] tracking-[0.02em] [overflow-wrap:anywhere] md:text-[12px] md:tracking-[0.06em]">
+                  <span className="min-w-0 text-[clamp(11px,calc(10.046px+0.254vw),12px)] tracking-[0.02em] [overflow-wrap:anywhere] md:tracking-[0.06em]">
                     {/* Phones wrap the email at the @, not mid-word. */}
                     {text.split(/(?=@gmail)/).map((part, i) => (
                       <Fragment key={i}>

@@ -9,7 +9,7 @@ export default function LegalPage({ cfg, title, children }) {
       <main id="main" className="section">
         <div className="wrap">
           <p className="label text-hls-signal-dark">HIM LIFE SCHOOL · Blueprint Consultation</p>
-          <h1 className="mt-4 text-[38px] leading-tight md:text-[52px]">{title}</h1>
+          <h1 className="mt-4 text-[clamp(38px,calc(24.641px+3.562vw),52px)] leading-tight">{title}</h1>
           <div className="prose-legal mt-8">{children}</div>
           <p className="mt-12">
             <a href="/sip" className="inline-flex min-h-11 items-center">

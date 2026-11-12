@@ -106,7 +106,7 @@ export function WhoFor({ cfg }) {
           {SIGNS.map((s) => (
             <li key={s} className="flex items-start gap-4 py-5">
               <Check />
-              <span className="text-[17px] md:text-[18px]">{s}</span>
+              <span className="text-[clamp(17px,calc(16.046px+0.254vw),18px)]">{s}</span>
             </li>
           ))}
         </ul>
@@ -318,7 +318,7 @@ export function Example({ cfg }) {
               <p className="label text-hls-signal-dark">
                 {String(i + 1).padStart(2, '0')} · {k}
               </p>
-              <p className="mt-2 text-[17px] md:text-[18px]">{v}</p>
+              <p className="mt-2 text-[clamp(17px,calc(16.046px+0.254vw),18px)]">{v}</p>
             </li>
           ))}
         </ol>
@@ -477,7 +477,7 @@ export function Proof() {
         <ul className="mt-10 grid gap-5 md:grid-cols-2">
           {items.map((t) => (
             <li key={t.quote} className="card flex flex-col p-6 md:p-8">
-              <blockquote className="font-display text-[20px] leading-snug md:text-[22px]">&ldquo;{t.quote}&rdquo;</blockquote>
+              <blockquote className="font-display text-[clamp(20px,calc(18.092px+0.509vw),22px)] leading-snug">&ldquo;{t.quote}&rdquo;</blockquote>
               <p className="mt-5 border-t border-hls-line pt-4 text-[15px] text-hls-muted md:mt-auto">
                 <span className="font-medium text-hls-ink">{t.name}</span>
                 {t.detail ? `, ${t.detail}` : ''}
@@ -521,11 +521,11 @@ export function Pricing({ cfg }) {
         <div className="card p-6 shadow-[0_24px_48px_-32px_rgba(16,32,48,0.35)] sm:p-8 md:p-10">
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div>
-              <h3 className="text-[24px] leading-tight md:text-[28px]">The Blueprint Consultation</h3>
+              <h3 className="text-[clamp(24px,calc(20.183px+1.018vw),28px)] leading-tight">The Blueprint Consultation</h3>
               <p className="mt-1 text-[15px] text-hls-muted">For CA Final Group 1 repeaters</p>
             </div>
             <div className="sm:text-right">
-              <p className="font-display text-[30px] leading-none md:text-[36px]">
+              <p className="font-display text-[clamp(30px,calc(24.275px+1.527vw),36px)] leading-none">
                 Free
               </p>
               <p className="mt-2 text-[15px] text-hls-muted">No payment needed</p>
@@ -652,7 +652,7 @@ export function Faq({ cfg }) {
         <div className="mt-10 border-t border-hls-line">
           {faqItems(cfg).map(([q, a]) => (
             <details key={q} className="group border-b border-hls-line">
-              <summary className="flex min-h-[56px] cursor-pointer items-center justify-between gap-6 py-5 text-[17px] font-semibold transition-colors hover:text-hls-signal-dark md:text-[18px]">
+              <summary className="flex min-h-[56px] cursor-pointer items-center justify-between gap-6 py-5 text-[clamp(17px,calc(16.046px+0.254vw),18px)] font-semibold transition-colors hover:text-hls-signal-dark">
                 {q}
                 <span className="faq-sign transition-transform">
                   <Icon name="chevron" />

@@ -40,15 +40,10 @@
     background-color: var(--color-hls-paper);
     color: var(--color-hls-ink);
     font-family: var(--font-body);
-    font-size: 17px;
+    /* 17px on a 375px phone growing to 18px at 768px, instead of a jump. */
+    font-size: clamp(17px, calc(16.046px + 0.254vw), 18px);
     line-height: 1.6;
     overflow-x: clip;
-  }
-
-  @media (min-width: 768px) {
-    body.book-body {
-      font-size: 18px;
-    }
   }
 
   ::selection {

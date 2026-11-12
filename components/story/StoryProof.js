@@ -21,7 +21,7 @@ export default function StoryProof() {
       <div className="story-frame mx-auto w-full max-w-[1200px] lg:max-w-none">
         {showCredential ? (
           credential ? (
-            <p className="max-w-[60ch] font-body text-[16px] leading-[1.6] text-hls-platinum/85 md:text-[17px]">{credential}</p>
+            <p className="max-w-[60ch] font-body text-[clamp(16px,calc(15.046px+0.254vw),17px)] leading-[1.6] text-hls-platinum/85">{credential}</p>
           ) : (
             <p className={`${BOX} max-w-[60ch]`}>[Credential line: awaiting Himakanth]</p>
           )

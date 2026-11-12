@@ -221,7 +221,7 @@ export default function StoryWays() {
           >
             The Blueprint Consultation
           </h3>
-          <p className="mt-5 max-w-[46ch] font-body text-[16px] leading-[1.6] text-hls-platinum/75 md:text-[17px]">
+          <p className="mt-5 max-w-[46ch] font-body text-[clamp(16px,calc(15.046px+0.254vw),17px)] leading-[1.6] text-hls-platinum/75">
             A one-to-one conversation about your attempt, and a personal score-improvement blueprint
             to take away.
           </p>
@@ -249,7 +249,7 @@ export default function StoryWays() {
           >
             The Score Improvement Programme
           </h3>
-          <p className="mt-5 max-w-[46ch] font-body text-[16px] leading-[1.6] text-hls-platinum/75 md:text-[17px]">
+          <p className="mt-5 max-w-[46ch] font-body text-[clamp(16px,calc(15.046px+0.254vw),17px)] leading-[1.6] text-hls-platinum/75">
             Online. For CA Final Group 1 repeaters preparing for May 2027. Financial Reporting,
             Advanced Financial Management and Audit, with one-to-one attention to how you prepare
             and perform.
