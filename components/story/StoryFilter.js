@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { initGsap, onResize, reducedMotion, refreshSoon } from '@/lib/motion';
+import { initGsap, onResize, pinLength, reducedMotion, refreshSoon } from '@/lib/motion';
 import SignalStrands from './SignalStrands';
 import StoryCta from './StoryCta';
 
@@ -24,6 +24,8 @@ const PRIORITY = 5;
 const RUN = 350;
 const REST = 40;
 const CLEAR = 8;
+/** Phones scroll the same sequence over 60% of the length. */
+const PHONE = 0.6;
 
 /** Wide: each chip's left edge (px at 1440 wide, scaled), stacked top to bottom. */
 const STAGGER = [0, 50, 15, 70, 30];
@@ -179,7 +181,7 @@ export default function StoryFilter() {
           scrollTrigger: {
             trigger: st,
             start: 'top top',
-            end: `+=${RUN + REST + CLEAR}%`,
+            end: pinLength(RUN + REST + CLEAR, Math.round((RUN + REST + CLEAR) * PHONE)),
             pin: true,
             scrub: 0.5,
             anticipatePin: 1,

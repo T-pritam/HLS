@@ -5,7 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import WordReveal, { toWords } from '@/components/WordReveal';
 import MagnetLink from '@/components/ui/MagnetLink';
 import { OUTLINE, OutlineArrow } from '@/components/ui/PillLink';
-import { initGsap, LANDING_URL, onResize, reducedMotion, refreshSoon } from '@/lib/motion';
+import { initGsap, LANDING_URL, onResize, pinLength, reducedMotion, refreshSoon } from '@/lib/motion';
 
 const CONSULTATION = 'THE BLUEPRINT CONSULTATION';
 const PROGRAMME = 'THE SCORE IMPROVEMENT PROGRAMME';
@@ -102,7 +102,7 @@ export default function StoryWays() {
           scrollTrigger: {
             trigger: st,
             start: 'top top',
-            end: '+=250%',
+            end: pinLength(250, 150),
             pin: true,
             scrub: 0.6,
             anticipatePin: 1,

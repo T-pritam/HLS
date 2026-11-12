@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { initGsap, reducedMotion } from '@/lib/motion';
+import { initGsap, pinLength, reducedMotion } from '@/lib/motion';
 import { SHOW_STAT, STAT_LABEL, STAT_VALUE } from '@/lib/story-facts';
 
 /** How many of the hundred desks light: the percentage, rounded. */
@@ -99,7 +99,7 @@ export default function StoryNumber() {
         scrollTrigger: {
           trigger: section.current,
           start: 'top top',
-          end: '+=220%',
+          end: pinLength(220, 130),
           pin: true,
           scrub: 0.5,
           anticipatePin: 1,

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import Photo from '@/components/Photo';
-import { initGsap, reducedMotion } from '@/lib/motion';
+import { initGsap, pinLength, reducedMotion } from '@/lib/motion';
 import { HallSheet, Marksheet } from './DeskObjects';
 import LampGlow from './LampGlow';
 
@@ -67,7 +67,7 @@ export default function StoryMoments() {
         scrollTrigger: {
           trigger: section.current,
           start: 'top top',
-          end: '+=270%',
+          end: pinLength(270, 170),
           pin: true,
           scrub: 0.6,
           anticipatePin: 1,
