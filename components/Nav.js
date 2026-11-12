@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import Image from 'next/image';
 import PillLink from '@/components/ui/PillLink';
 import { LANDING_URL } from '@/lib/motion';
-import { CTA_LABEL } from '@/lib/story-facts';
+import { NAV_CTA_LABEL } from '@/lib/story-facts';
 
 /** The crest and one way forward. Nothing else. */
 export default function Nav() {
@@ -86,7 +86,7 @@ export default function Nav() {
 
         {/* Navy over a light panel, Platinum everywhere else. */}
         <PillLink href={LANDING_URL} size="md" tone={light ? 'light' : 'dark'}>
-          {CTA_LABEL}
+          {NAV_CTA_LABEL}
         </PillLink>
       </nav>
     </header>

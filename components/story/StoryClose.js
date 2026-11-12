@@ -12,6 +12,7 @@ const HEADLINE = [toWords('Before another attempt, find out why.')];
 export default function StoryClose() {
   const section = useRef(null);
   const headline = useRef(null);
+  const tag = useRef(null);
   const rest = useRef(null);
 
   useEffect(() => {
@@ -21,9 +22,11 @@ export default function StoryClose() {
     const ctx = gsap.context(() => {
       const words = headline.current.querySelectorAll('.js-word-inner');
       gsap.set(rest.current, { opacity: 0, y: 16 });
+      gsap.set(tag.current, { opacity: 0 });
       const tl = gsap
         .timeline({ paused: true })
-        .fromTo(words, { y: 0, yPercent: 115 }, { yPercent: 0, duration: 0.9, ease: 'expo.out', stagger: 0.07 })
+        .to(tag.current, { opacity: 1, duration: 0.6, ease: 'power2.out' })
+        .fromTo(words, { y: 0, yPercent: 115 }, { yPercent: 0, duration: 0.9, ease: 'expo.out', stagger: 0.07 }, 0.15)
         .to(rest.current, { opacity: 1, y: 0, duration: 0.8, ease: 'expo.out' }, '<0.5');
 
       // Plays once, however the visitor arrives.
@@ -60,6 +63,10 @@ export default function StoryClose() {
       />
       <div className="flex w-full flex-1 flex-col items-center justify-center">
         <div ref={headline}>
+          {/* The campaign's tag, as in the ads. */}
+          <p ref={tag} className="kicker mb-[clamp(16px,3vh,28px)] text-signal-read">
+            #OneLastAttempt
+          </p>
           <WordReveal as="h2" mode="manual" lines={HEADLINE} className="scene-line max-w-[14em] text-hls-platinum" />
         </div>
 

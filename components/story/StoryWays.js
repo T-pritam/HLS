@@ -250,9 +250,9 @@ export default function StoryWays() {
             The Score Improvement Programme
           </h3>
           <p className="mt-5 max-w-[46ch] font-body text-[clamp(16px,calc(15.046px+0.254vw),17px)] leading-[1.6] text-hls-platinum/75">
-            Online. For CA Final Group 1 repeaters preparing for May 2027. Financial Reporting,
-            Advanced Financial Management and Audit, with one-to-one attention to how you prepare
-            and perform.
+            For CA Final Group 1 repeaters preparing for May 2027. Financial Reporting, Advanced
+            Financial Management and Audit, with one-to-one attention to how you prepare and perform.
+            Built on our five-step framework: mindset, routine, learning, revision and practice.
           </p>
           <p className="mt-6 max-w-[46ch] border-t border-hls-mist/15 pt-5 font-body text-[15px] leading-[1.6] text-hls-mist">
             Discussed with a counsellor after your consultation, if it fits.

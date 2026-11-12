@@ -63,8 +63,8 @@ export default function StoryFooter() {
           </ul>
 
           <p className="mt-8 max-w-[68ch]">
-            This page saves nothing you type. If you share your number on the next page, it is used only to call
-            you about your attempt.
+            This page saves nothing you type. If you book, your details are used only to arrange your
+            consultation.
           </p>
           <p className="mt-6 uppercase tracking-[0.18em]">© 2026 HIM LIFE SCHOOL</p>
         </div>

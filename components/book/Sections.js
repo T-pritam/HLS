@@ -1,5 +1,6 @@
 import Todo from './Todo';
 import BookPhoto from './BookPhoto';
+import Offer from './Offer';
 import { hasContact } from './Contact';
 import { approvedTestimonials, mentor, mentorReady } from '@/lib/book/content';
 
@@ -336,7 +337,7 @@ export function Example({ cfg }) {
 /* ------------------------------------------------------------------ */
 
 const STEPS = [
-  ['Book your slot', 'Confirm you are a Group 1 repeater, give your details and choose a time. It is free.'],
+  ['Book your slot', 'Confirm you are a Group 1 repeater, give your details and choose a time.'],
   ['Share your papers privately', 'You receive a private link for your marksheets and mock papers.'],
   ['The consultation', 'A one-to-one conversation about your attempt.'],
   ['Your blueprint', 'Where you stand, the gaps, your priorities and a realistic next-step plan, in writing.'],
@@ -351,7 +352,7 @@ export function NextSteps() {
         <div>
           <SectionHead kicker="How it works" id="next-title" title="From booking to blueprint." />
           <p className="mt-6 max-w-md font-medium">
-            The consultation is bought on its own. Booking it does not enrol you in anything.
+            The consultation stands on its own. Booking it does not enrol you in anything.
           </p>
         </div>
         <ol className="steps">
@@ -394,7 +395,7 @@ export function Programme() {
           </p>
         </div>
         <div className="rounded-lg border border-white/15 bg-white/[0.04] p-6 md:p-8">
-          <p className="label text-[#8ec3ef]">Online · four components</p>
+          <p className="label text-[#8ec3ef]">Four components</p>
           <ul className="mt-5 space-y-4">
             {COMPONENTS.map(([name, note]) => (
               <li key={name} className="flex items-start gap-3">
@@ -515,7 +516,8 @@ export function Pricing({ cfg }) {
         <div className="lg:sticky lg:top-28">
           <SectionHead kicker="Price" id="pricing-title" title="Start with a clear diagnosis." />
           <p className="lede mt-6">
-            A free consultation and your written blueprint. Nothing is sold on this page.
+            Your introductory consultation and written blueprint are complimentary for a limited period. Nothing
+            is sold on this page.
           </p>
         </div>
         <div className="card p-6 shadow-[0_24px_48px_-32px_rgba(16,32,48,0.35)] sm:p-8 md:p-10">
@@ -524,12 +526,7 @@ export function Pricing({ cfg }) {
               <h3 className="text-[clamp(24px,calc(20.183px+1.018vw),28px)] leading-tight">The Blueprint Consultation</h3>
               <p className="mt-1 text-[15px] text-hls-muted">For CA Final Group 1 repeaters</p>
             </div>
-            <div className="sm:text-right">
-              <p className="font-display text-[clamp(30px,calc(24.275px+1.527vw),36px)] leading-none">
-                Free
-              </p>
-              <p className="mt-2 text-[15px] text-hls-muted">No payment needed</p>
-            </div>
+            <Offer cfg={cfg} align="end" />
           </div>
           <CheckList items={INCLUDED} className="mt-8 space-y-3 border-t border-hls-line pt-8" />
           {facts.length > 0 && (
@@ -573,7 +570,7 @@ function attendAnswer() {
   return (
     <p>
       Use the reschedule or cancel link in your Calendly confirmation email, so the time can go to another student.
-      The consultation is free, so there is nothing to refund.
+      The consultation is complimentary, so there is nothing to refund.
     </p>
   );
 }
@@ -595,12 +592,11 @@ export function faqItems(cfg) {
       </p>,
     ],
     [
-      'Is it online?',
+      'How is the consultation held?',
       <p key="a">
-        The Score Improvement Programme is online.{' '}
         {cfg.consultationMode
           ? `The consultation is held as follows: ${cfg.consultationMode}.`
-          : 'How the consultation is held is to be confirmed.'}
+          : 'The details are in the confirmation email you receive when you book your time.'}
       </p>,
     ],
     [

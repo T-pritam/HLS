@@ -13,15 +13,17 @@ function Draft() {
         written score-improvement blueprint. It is for CA Final Group 1 repeaters only.
       </p>
       <p>
-        It is free and standalone. It does not enrol you in any programme, and there is no obligation to enrol
-        afterwards.
+        It is complimentary for a limited period, and standalone. It does not enrol you in any programme, and there
+        is no obligation to enrol afterwards.
       </p>
       <h2>No promise of results</h2>
       <p>
         The consultation gives you a diagnosis and a plan. It does not promise a pass or any particular marks.
       </p>
       <h2>Price</h2>
-      <p>The consultation is free. You are not asked to pay anything to book it.</p>
+      <p>
+        The consultation is complimentary for a limited period. You are not asked to pay anything to book it.
+      </p>
       <h2>Booking, rescheduling and cancelling</h2>
       <p>
         Times are booked through Calendly. Your booking is confirmed by Calendly&rsquo;s email, which also has the
