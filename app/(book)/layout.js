@@ -50,6 +50,9 @@ export const viewport = {
   themeColor: '#ffffff',
   // Light by design: keeps Android's forced dark mode from turning the page black.
   colorScheme: 'only light',
+  // Edge to edge on notched iPhones; .wrap keeps the content inside the
+  // safe area and the sticky bar clears the home bar.
+  viewportFit: 'cover',
   width: 'device-width',
   initialScale: 1,
 };

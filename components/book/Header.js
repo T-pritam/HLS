@@ -33,7 +33,7 @@ export default function Header({ ctaHref = '#book', showCta = true, links = [] }
   }, [open]);
 
   return (
-    <header ref={header} className="sticky top-0 z-40 border-b border-hls-line bg-white/90 backdrop-blur">
+    <header ref={header} className="sticky top-0 z-40 border-b border-hls-line bg-white/90 pt-[env(safe-area-inset-top)] backdrop-blur">
       <div className="wrap flex min-h-16 items-center justify-between gap-4 py-1.5">
         <a href="/sip" className="-m-2 block p-2" aria-label="HIM LIFE SCHOOL, Blueprint Consultation">
           <Logo tone="light" priority className="block w-[104px] sm:w-[120px] [&_img]:w-full" />

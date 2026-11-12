@@ -73,22 +73,26 @@
 }
 
 @layer components {
+  /* The gutter, or the notch's safe area when that is wider (iPhones held
+     sideways). env() is 0 everywhere else. */
   .wrap {
+    --gutter: 16px;
     width: 100%;
     max-width: 1200px;
     margin-inline: auto;
-    padding-inline: 16px;
+    padding-left: max(var(--gutter), env(safe-area-inset-left));
+    padding-right: max(var(--gutter), env(safe-area-inset-right));
   }
 
   @media (min-width: 380px) {
     .wrap {
-      padding-inline: 20px;
+      --gutter: 20px;
     }
   }
 
   @media (min-width: 768px) {
     .wrap {
-      padding-inline: 40px;
+      --gutter: 40px;
     }
   }
 
