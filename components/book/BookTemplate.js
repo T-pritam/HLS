@@ -117,7 +117,7 @@ export default function BookTemplate({ requested = 'a' }) {
                 calendlyUrl={cfg.calendlyUrl}
                 contact={{ phone: cfg.supportPhone, whatsapp: cfg.supportWhatsApp, email: cfg.supportEmail }}
               />
-              <p className="mt-6 flex items-center justify-center gap-2 text-center text-[15px] text-hls-muted">
+              <p className="mt-6 flex items-center justify-center gap-2 text-center text-[16px] text-hls-muted">
                 <Icon name="shield" size={18} className="text-hls-muted" />
                 No obligation to join anything afterwards.
               </p>

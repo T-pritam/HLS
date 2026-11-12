@@ -111,7 +111,7 @@ export function WhoFor({ cfg }) {
             </li>
           ))}
         </ul>
-        <p className="mt-8 max-w-2xl text-[15px] text-hls-muted">
+        <p className="mt-8 max-w-2xl text-[16px] text-hls-muted">
           It is not for CA Inter, first-time CA Final candidates or Group 2.
         </p>
       </div>
@@ -193,7 +193,7 @@ export function WhatYouGet({ cfg }) {
               </div>
               <h3 className="h-card mt-5">{c.q}</h3>
               <p className="mt-3 text-hls-muted">{c.text}</p>
-              <p className="mt-6 border-t border-hls-line pt-4 text-[15px] font-medium md:mt-auto">{c.out}</p>
+              <p className="mt-6 border-t border-hls-line pt-4 text-[16px] font-medium md:mt-auto">{c.out}</p>
             </div>
           ))}
         </div>
@@ -260,7 +260,7 @@ export function Consultation({ cfg }) {
             <div className="card p-5">
               <p className="font-medium">Bring</p>
               <CheckList items={BRING} className="mt-3 space-y-2" />
-              <p className="mt-4 text-[15px] text-hls-muted">
+              <p className="mt-4 text-[16px] text-hls-muted">
                 You share these through a private link after booking, never on this page.
               </p>
             </div>
@@ -323,7 +323,7 @@ export function Example({ cfg }) {
             </li>
           ))}
         </ol>
-        <p className="mt-10 max-w-2xl text-[15px] text-hls-muted">
+        <p className="mt-10 max-w-2xl text-[16px] text-hls-muted">
           This shows the kind of reasoning a blueprint works through. It is not a real student&rsquo;s result and not a
           promise of any outcome.
         </p>
@@ -553,7 +553,7 @@ export function Pricing({ cfg }) {
           <a href="#book" className="btn-primary mt-8 w-full">
             Book your blueprint consultation
           </a>
-          <p className="mt-4 text-center text-[15px] text-hls-muted">
+          <p className="mt-4 text-center text-[16px] text-hls-muted">
             The Score Improvement Programme is separate. Its cost is shared on a counsellor call, if it fits.
           </p>
         </div>

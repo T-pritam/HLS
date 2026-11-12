@@ -254,7 +254,7 @@ export default function StoryWays() {
             Financial Management and Audit, with one-to-one attention to how you prepare and perform.
             Built on our five-step framework: mindset, routine, learning, revision and practice.
           </p>
-          <p className="mt-6 max-w-[46ch] border-t border-hls-mist/15 pt-5 font-body text-[15px] leading-[1.6] text-hls-mist">
+          <p className="mt-6 max-w-[46ch] border-t border-hls-mist/15 pt-5 font-body text-[16px] leading-[1.6] text-hls-mist">
             Discussed with a counsellor after your consultation, if it fits.
           </p>
           <div className="mt-auto pt-10">

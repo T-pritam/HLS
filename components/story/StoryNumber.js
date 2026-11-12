@@ -206,7 +206,7 @@ export default function StoryNumber() {
           </p>
           <p
             data-rise
-            className="mt-3 max-w-[22em] font-display text-[clamp(14px,1.45vw,24px)] leading-[1.3] tracking-[-0.01em] text-hls-platinum/85 lg:mt-5"
+            className="mt-3 max-w-[22em] font-display text-[clamp(16px,1.45vw,24px)] leading-[1.3] tracking-[-0.01em] text-hls-platinum/85 lg:mt-5"
           >
             Most people who sit this paper don&apos;t get the result they worked for.
           </p>

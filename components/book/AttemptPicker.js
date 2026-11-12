@@ -42,7 +42,7 @@ export default function AttemptPicker({ priceLine }) {
             <a href="#book" className="btn-primary mt-6 w-full sm:w-auto">
               Book your blueprint consultation
             </a>
-            <p className="mt-4 text-[15px] text-hls-muted">No obligation to join anything afterwards.</p>
+            <p className="mt-4 text-[16px] text-hls-muted">No obligation to join anything afterwards.</p>
           </>
         ) : (
           <p className="lede mt-6">

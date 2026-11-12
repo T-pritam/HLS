@@ -135,7 +135,7 @@ function Field({ id, label, hint, error, children }) {
         {label}
       </label>
       {hint && (
-        <p id={`${id}-hint`} className="mt-1 text-[15px] text-hls-muted">
+        <p id={`${id}-hint`} className="mt-1 text-[16px] text-hls-muted">
           {hint}
         </p>
       )}
@@ -460,7 +460,7 @@ export default function Booking({ variant, calendlyUrl, contact }) {
               <input id="bk-website" tabIndex={-1} autoComplete="off" value={form.website} onChange={set('website')} />
             </div>
 
-            <div className="rounded-md bg-hls-wash p-4 text-[15px]">
+            <div className="rounded-md bg-hls-wash p-4 text-[16px]">
               <p className="font-medium text-hls-navy">How we use your details</p>
               <p className="mt-1 text-hls-muted">
                 We use your name, mobile and email to book and run your consultation and to contact you about it.
@@ -496,7 +496,7 @@ export default function Booking({ variant, calendlyUrl, contact }) {
 
             <fieldset>
               <legend className="font-medium">Updates from HIM LIFE SCHOOL (optional)</legend>
-              <p className="mt-1 text-[15px] text-hls-muted">
+              <p className="mt-1 text-[16px] text-hls-muted">
                 Separately, you may hear from us about HLS programmes. Tick only the channels you want. You can
                 withdraw this at any time.
               </p>
