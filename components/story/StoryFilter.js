@@ -74,6 +74,7 @@ export default function StoryFilter() {
   const strands = useRef(null);
   const strandsWrap = useRef(null);
   const cta = useRef(null);
+  const ctaBand = useRef(null);
 
   useEffect(() => {
     const gsap = initGsap();
@@ -114,7 +115,10 @@ export default function StoryFilter() {
           left: hb.l + BRAIN.left * size,
           top: hb.t + BRAIN.top * size,
         };
-        slit.current.style.top = wide ? `${brain.y}px` : '';
+        // Narrow: the slit sits just above the brain, not mid-screen, so the
+        // strands run into it and the one line out of it lands in the brain.
+        const gap = Math.round(Math.min(72, Math.max(40, h * 0.07)));
+        slit.current.style.top = `${wide ? brain.y : brain.top - gap}px`;
         slit.current.style.left = wide ? '' : `${brain.x}px`;
         const s = rel(slit.current.getBoundingClientRect());
 
@@ -161,9 +165,16 @@ export default function StoryFilter() {
           scale: wide ? Math.min(1, h / 900) : 0.45,
         });
 
+        // Narrow: the button takes the space between the caption and the head.
+        ctaBand.current.style.top = wide ? '' : `${capBox.b + 12}px`;
+        ctaBand.current.style.bottom = wide ? '' : `${h - (brain.top - 8)}px`;
+
         gsap.set(caps.slice(1), { autoAlpha: 0, y: 16 });
         gsap.set(chips, { autoAlpha: 0, y: 12 });
         gsap.set([slit.current, glow, dimmer, calm], { opacity: 0 });
+        // Narrow: the filter is there, faint, from the start, so the guesses
+        // visibly run into it and stop until it lights.
+        if (!wide) gsap.set(slit.current, { opacity: 0.3 });
 
         // The sequence runs 0 to 10; the rest and the clear add on at the same rate.
         const unit = 10 / RUN;
@@ -320,7 +331,7 @@ export default function StoryFilter() {
         </div>
 
         {/* The one way forward: the middle of the stage, where the chips were. */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 right-0 z-10 flex items-center justify-center px-5 lg:right-[38%]">
+        <div ref={ctaBand} className="pointer-events-none absolute inset-y-0 left-0 right-0 z-10 flex items-center justify-center px-5 lg:right-[38%]">
           <div ref={cta} className="pointer-events-auto invisible opacity-0 motion-reduce:visible motion-reduce:opacity-100">
             <StoryCta primary onClick={() => track('story_cta_clicked')} />
           </div>
