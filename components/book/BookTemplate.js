@@ -2,7 +2,7 @@ import Header from './Header';
 import Footer from './Footer';
 import Booking from './Booking';
 import StickyCta from './StickyCta';
-import { OFFER, OFFER_NOTE, WasFee } from './Offer';
+import { OFFER, OFFER_NOTE } from './Offer';
 import { HeroAttempt, HeroDiagnosis, HeroSample } from './Hero';
 import {
   Consultation,
@@ -96,10 +96,7 @@ export default function BookTemplate({ requested = 'a' }) {
               <p className="mt-6 font-display text-[clamp(24px,calc(20.183px+1.018vw),28px)] leading-tight">
                 {OFFER}
               </p>
-              <p className="mt-2 text-[15px] text-hls-muted">
-                <WasFee cfg={cfg} className="mr-2" />
-                {OFFER_NOTE} · One-to-one consultation
-              </p>
+              <p className="mt-2 text-[15px] text-hls-muted">{OFFER_NOTE} · One-to-one consultation</p>
               <ol className="mt-8 flex flex-col items-center gap-3 text-[15px] sm:flex-row sm:justify-center sm:gap-6">
                 {BOOK_STEPS.map((t, i) => (
                   <li key={t} className="flex items-center gap-2.5">
@@ -126,15 +123,7 @@ export default function BookTemplate({ requested = 'a' }) {
         </section>
       </main>
       <Footer cfg={cfg} />
-      <StickyCta
-        price={OFFER}
-        note={
-          <>
-            <WasFee cfg={cfg} className="mr-1.5" />
-            {OFFER_NOTE}
-          </>
-        }
-      />
+      <StickyCta price={OFFER} note={OFFER_NOTE} />
     </>
   );
 }
