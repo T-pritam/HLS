@@ -5,7 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import WordReveal, { toWords } from '@/components/WordReveal';
 import MagnetLink from '@/components/ui/MagnetLink';
 import { OUTLINE, OutlineArrow } from '@/components/ui/PillLink';
-import { initGsap, LANDING_URL, onResize, pinLength, reducedMotion, refreshSoon } from '@/lib/motion';
+import { initGsap, LANDING_URL, onResize, pinLength, staticScenes, refreshSoon } from '@/lib/motion';
 
 const CONSULTATION = 'THE BLUEPRINT CONSULTATION';
 const PROGRAMME = 'THE SCORE IMPROVEMENT PROGRAMME';
@@ -52,7 +52,7 @@ export default function StoryWays() {
 
   useEffect(() => {
     const gsap = initGsap();
-    if (reducedMotion()) return;
+    if (staticScenes()) return;
 
     let ctx;
     const build = () => {
@@ -254,7 +254,7 @@ export default function StoryWays() {
             Financial Management and Audit, with one-to-one attention to how you prepare and perform.
             Built on our five-step framework: mindset, routine, learning, revision and practice.
           </p>
-          <p className="mt-6 max-w-[46ch] border-t border-hls-mist/15 pt-5 font-body text-[15px] leading-[1.6] text-hls-mist">
+          <p className="mt-6 max-w-[46ch] border-t border-hls-mist/15 pt-5 font-body text-[16px] leading-[1.6] text-hls-mist">
             Discussed with a counsellor after your consultation, if it fits.
           </p>
           <div className="mt-auto pt-10">

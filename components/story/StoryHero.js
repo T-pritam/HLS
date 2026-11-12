@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import WordReveal, { toWords } from '@/components/WordReveal';
 import { initGsap, reducedMotion, warmFirstInput } from '@/lib/motion';
 
@@ -55,14 +56,22 @@ export default function StoryHero() {
         }
       );
 
-      // Scroll cue, draws down then drains down, forever.
+      // Scroll cue, draws down then drains down, forever. It rests while
+      // the hero is off screen.
       const bar = cue.current.firstChild;
-      gsap
+      const loop = gsap
         .timeline({ repeat: -1, delay: 2.4, defaults: { ease: 'power1.inOut' } })
         .fromTo(bar, { scaleY: 0, transformOrigin: 'top center' }, { scaleY: 1, duration: 1.1 })
         .set(bar, { transformOrigin: 'bottom center' })
         .to(bar, { scaleY: 0, duration: 1.1 })
         .to({}, { duration: 0.35 });
+      ScrollTrigger.create({
+        trigger: section.current,
+        start: 'top top',
+        end: 'bottom top',
+        onLeave: () => loop.pause(),
+        onEnterBack: () => loop.play(),
+      });
     }, section);
 
     return () => ctx.revert();

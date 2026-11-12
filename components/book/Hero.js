@@ -31,7 +31,7 @@ function Cta() {
           See what you get <span aria-hidden="true">→</span>
         </a>
       </div>
-      <p className="mt-4 text-[15px] text-hls-muted">Three short steps: confirm you are eligible, give your details, then choose a time.</p>
+      <p className="mt-4 text-[16px] text-hls-muted">Three short steps: confirm you are eligible, give your details, then choose a time.</p>
       <div className="callout mt-6 max-w-xl">
         <Icon name="shield" />
         <p>No obligation to join anything afterwards. The consultation is complete on its own.</p>

@@ -72,7 +72,7 @@ export default function StoryBlueprint() {
           </div>
         </article>
 
-        <p className="mt-5 max-w-[640px] font-body text-[15px] leading-[1.5] text-hls-platinum/80">
+        <p className="mt-5 max-w-[640px] font-body text-[16px] leading-[1.5] text-hls-platinum/80">
           Every blueprint is written for one student’s marks and mocks.
         </p>
       </div>

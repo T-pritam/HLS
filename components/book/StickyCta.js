@@ -27,7 +27,7 @@ export default function StickyCta({ price, note }) {
     >
       <div className="wrap flex items-center justify-between gap-4">
         <div className="min-w-0">
-          <p className="font-display text-[22px] leading-none">{price}</p>
+          <p className="font-display text-[clamp(18px,5.2vw,22px)] leading-none">{price}</p>
           <p className="mt-1 truncate text-[13px] text-hls-muted">{note}</p>
         </div>
         <a href="#book" className="btn-primary !min-h-12 flex-none !px-5 !text-[16px]" tabIndex={show ? 0 : -1}>

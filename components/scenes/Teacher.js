@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import WordReveal, { toWords } from '@/components/WordReveal';
-import { afterFirstInput, initGsap, pinLength, reducedMotion } from '@/lib/motion';
+import { afterFirstInput, initGsap, pinLength, staticScenes } from '@/lib/motion';
 
 const NAME = [toWords('Himakanth Andhavarapu, CA.')];
 
@@ -26,7 +26,7 @@ export default function Teacher({ body = null }) {
 
   useEffect(() => {
     const gsap = initGsap();
-    if (reducedMotion()) return;
+    if (staticScenes()) return;
 
     const el = section.current;
 

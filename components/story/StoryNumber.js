@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { initGsap, pinLength, reducedMotion } from '@/lib/motion';
+import { initGsap, pinLength, staticScenes } from '@/lib/motion';
 import { SHOW_STAT, STAT_LABEL, STAT_VALUE } from '@/lib/story-facts';
 
 /** How many of the hundred desks light: the percentage, rounded. */
@@ -66,7 +66,7 @@ export default function StoryNumber() {
 
   useEffect(() => {
     const gsap = initGsap();
-    if (!SHOW_STAT || reducedMotion()) return;
+    if (!SHOW_STAT || staticScenes()) return;
     const digitsEl = digits.current;
 
     const ctx = gsap.context(() => {
@@ -206,7 +206,7 @@ export default function StoryNumber() {
           </p>
           <p
             data-rise
-            className="mt-3 max-w-[22em] font-display text-[clamp(14px,1.45vw,24px)] leading-[1.3] tracking-[-0.01em] text-hls-platinum/85 lg:mt-5"
+            className="mt-3 max-w-[22em] font-display text-[clamp(16px,1.45vw,24px)] leading-[1.3] tracking-[-0.01em] text-hls-platinum/85 lg:mt-5"
           >
             Most people who sit this paper don&apos;t get the result they worked for.
           </p>

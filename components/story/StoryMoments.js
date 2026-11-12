@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import Photo from '@/components/Photo';
-import { initGsap, pinLength, reducedMotion } from '@/lib/motion';
+import { initGsap, pinLength, staticScenes } from '@/lib/motion';
 import { HallSheet, Marksheet } from './DeskObjects';
 import LampGlow from './LampGlow';
 
@@ -34,7 +34,7 @@ export default function StoryMoments() {
 
   useEffect(() => {
     const gsap = initGsap();
-    if (reducedMotion()) return;
+    if (staticScenes()) return;
 
     const ctx = gsap.context(() => {
       const caps = [...captions.current.children];
@@ -149,16 +149,17 @@ export default function StoryMoments() {
       <LampGlow glowRef={lamp} className="rm-hide -z-10" />
       <span ref={dim} className="rm-hide pointer-events-none absolute inset-0 z-20 bg-black opacity-0" />
 
-      {/* With motion: one stage, captions and objects each stacked in place. */}
-      <div className="rm-hide mx-auto flex h-full w-full max-w-[1400px] flex-col items-center gap-6 px-5 pb-6 pt-[96px] md:grid md:grid-cols-[1fr_auto] md:items-center md:gap-16 md:px-10 md:pb-0 md:pt-[84px]">
-        <div ref={captions} className="grid w-full self-start md:self-center">
+      {/* With motion: one stage, captions and objects each stacked in place.
+          Caption over the object below 1024px; side by side in the frame above. */}
+      <div className="story-frame rm-hide mx-auto flex h-full w-full max-w-[1400px] flex-col items-center gap-6 px-5 pb-6 pt-[96px] md:px-10 md:pt-[120px] lg:grid lg:max-w-none lg:grid-cols-[1fr_auto] lg:items-center lg:gap-16 lg:px-0 lg:pb-0 lg:pt-[84px]">
+        <div ref={captions} className="grid w-full self-start lg:self-center">
           {MOMENTS.flatMap((m) => m.captions).map((c) => (
             <p key={c} className={`col-start-1 row-start-1 max-w-[13em] ${CAPTION}`}>
               {c}
             </p>
           ))}
         </div>
-        <div ref={objects} className="grid flex-1 place-items-center md:flex-none">
+        <div ref={objects} className="grid flex-1 place-items-center lg:flex-none">
           {MOMENTS.map(({ key, Item }) => (
             <div key={key} className="col-start-1 row-start-1">
               <Item />
