@@ -61,7 +61,9 @@ export default function Nav() {
       ].join(' ')}
       style={{ transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)' }}
     >
-      <nav className="mx-auto flex h-[72px] w-full max-w-[1600px] items-center justify-between gap-4 px-5 md:h-[84px] md:px-10">
+      {/* From 1024px the bar lines up with the story's text frame (story.css
+          .story-frame: 1280px at most, clamp(32px, 6vw, 96px) gutters). */}
+      <nav className="mx-auto flex h-[72px] w-full max-w-[1600px] items-center justify-between gap-4 px-5 md:h-[84px] md:px-10 lg:w-[min(1280px,100%_-_2*clamp(32px,6vw,96px))] lg:max-w-none lg:px-0">
         {/* A plain link on purpose: from the 404 page a full load brings the
             preloader and smooth scroll back with the story. */}
         {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
