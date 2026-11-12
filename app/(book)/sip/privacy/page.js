@@ -1,7 +1,7 @@
 import LegalPage, { DraftBanner, NotPublished } from '@/components/book/LegalPage';
 import { getPublicConfig } from '@/lib/book/config';
 
-export const metadata = { title: 'Privacy Notice' };
+export const metadata = { title: 'Privacy Notice', alternates: { canonical: '/sip/privacy' } };
 
 // Placeholder wording for review. Not legal advice and not approved.
 function Draft({ cfg }) {

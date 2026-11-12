@@ -2,7 +2,8 @@ import LegalPage from '@/components/book/LegalPage';
 import { getPublicConfig } from '@/lib/book/config';
 import { checkToken } from '@/lib/book/tokens';
 
-export const metadata = { title: 'Private intake' };
+// Per-lead private link: never indexed.
+export const metadata = { title: 'Private intake', robots: { index: false, follow: false } };
 
 /**
  * Stub for the private, access-controlled intake. It checks the per-lead link
