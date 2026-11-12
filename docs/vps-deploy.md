@@ -14,7 +14,7 @@ One Next.js app serves the whole site:
 
 | | |
 |---|---|
-| Address | `https://hls.tach21.com` for now; `himlifeschool.com` once the client hands over its DNS |
+| Address | `https://himlifeschool.com` (since 2026-11-12; `www` and `http` redirect to it). `https://hls.tach21.com` still serves the same app. |
 | Server | the shared VPS: app machine `pritam-dev`, front machine `srv1555908` (see the team's `WEB_DEPLOY_VPS.md` runbook) |
 | App | PM2 `hls`, cluster ×2, port 3008, `next start -p 3008 -H 0.0.0.0` |
 | Code | `/var/www/hls-current` → `/var/www/hls-releases/<stamp>` (last 3 kept), checkout in `/var/www/hls-repo` |
@@ -70,18 +70,12 @@ Files in `deploy/` and where they live on the app machine:
 | `redis-hls.conf` | `/etc/redis/redis-hls.conf` |
 | `redis-hls.service`, `hls-redis-http.service` | `/etc/systemd/system/` |
 | `nginx-front-hls.tach21.com.conf` | appended to `/etc/nginx/sites-available/tach21-proxy` on the front machine |
+| `nginx-front-himlifeschool.com.conf` | same file, as it stands after certbot (cert `himlifeschool.com`, renews automatically) |
 
 Check: `systemctl status redis-hls hls-redis-http`, `redis-cli -p 6380 DBSIZE`.
 Back up `/var/lib/redis-hls` (it holds every lead and booking).
 
-## Switching to himlifeschool.com later
+## himlifeschool.com (done 2026-11-12)
 
-1. In `/var/www/env/hls-prod.env`: `NEXT_PUBLIC_SITE_URL=https://himlifeschool.com`.
-   Intake links already sent keep pointing at `hls.tach21.com`, so keep that name
-   working for a while.
-2. Front machine: add `server` blocks for `himlifeschool.com` and `www` (runbook 5.8),
-   before touching DNS.
-3. DNS at the client's provider: `A @` and `A www` → `187.127.145.209`, then certbot
-   (runbook 5.10).
-4. Run the workflow.
-5. `app/sitemap.js` already says `https://himlifeschool.com/`.
+DNS at GoDaddy: `A @ 187.127.145.209`, `CNAME www → @`. `NEXT_PUBLIC_SITE_URL=https://himlifeschool.com`,
+`NEXT_PUBLIC_NOINDEX=false`. Full record and the remaining steps: `docs/himlifeschool-go-live.md`.
