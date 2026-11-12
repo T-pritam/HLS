@@ -62,6 +62,9 @@ export default function Nav() {
       style={{ transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)' }}
     >
       <nav className="mx-auto flex h-[72px] w-full max-w-[1600px] items-center justify-between gap-4 px-5 md:h-[84px] md:px-10">
+        {/* A plain link on purpose: from the 404 page a full load brings the
+            preloader and smooth scroll back with the story. */}
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
         <a
           href="/"
           onClick={toTop}

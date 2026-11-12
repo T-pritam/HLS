@@ -24,7 +24,7 @@ export default async function Image() {
           color: '#e4e9ec',
         }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text */}
+        {/* eslint-disable-next-line jsx-a11y/alt-text */}
         <img src={src} width={53} height={70} />
         <div style={{ display: 'flex', flexDirection: 'column', fontSize: 76, lineHeight: 1.08, letterSpacing: -2 }}>
           <span>You worked.</span>
