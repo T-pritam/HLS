@@ -41,6 +41,9 @@ export const metadata = {
 
 export const viewport = {
   themeColor: '#000000',
+  // The page is already dark. Without this, Android's forced dark mode
+  // inverts the platinum pills and paper into dark grey.
+  colorScheme: 'dark',
   width: 'device-width',
   initialScale: 1,
 };

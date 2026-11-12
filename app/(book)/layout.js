@@ -48,6 +48,8 @@ export const metadata = {
 
 export const viewport = {
   themeColor: '#ffffff',
+  // Light by design: keeps Android's forced dark mode from turning the page black.
+  colorScheme: 'only light',
   width: 'device-width',
   initialScale: 1,
 };

@@ -23,6 +23,8 @@
    --------------------------------------------------------------- */
 
 html {
+  /* Dark by design: keeps browsers' forced dark modes off the page. */
+  color-scheme: dark;
   background-color: #000000;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
