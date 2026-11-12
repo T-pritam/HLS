@@ -25,11 +25,12 @@ what is left to do. Work through Part B top to bottom, ticking each box.
 | Step 4: rebuilt live commit `c4d57cb` with the new env, release `20261112162253`, health check passed | ✅ Done (by hand, see note below) |
 | Step 5: all pages, `/book` → `/sip` redirect, health, robots, sitemap, link-preview URLs on the new domain | ✅ Checked. Test booking still to do by a person. |
 
-> **CI/CD note (2026-11-12):** `.github/workflows/deploy.yml` is only on the `vps-deploy`
-> branch, not on `master`, so GitHub has no workflow registered and pushes to `master`
-> deploy nothing yet. The live code (`c4d57cb`) is also from `vps-deploy`. Merge
-> `vps-deploy` into `master` (PR) to turn automatic deploys on. The four `SSH_*` secrets
-> are already set.
+| CI/CD: `vps-deploy` (with `fix/responsive-polish`) merged into `master` (PR #2); pushes to `master` deploy automatically. First run `43205144912` passed | ✅ Done |
+| Step 3: `NEXT_PUBLIC_NOINDEX=false`; SEO (canonicals, sitemap with 5 pages, robots.txt, JSON-LD, Open Graph) live | ✅ Done |
+| Step 9: docs and nginx config committed | ✅ Done |
+
+**Still to do:** Step 5 test booking by a person, Step 6 outside services, Step 7 Search
+Console (needs your Google account), Step 8 in 3–4 weeks.
 
 ### Final DNS zone at GoDaddy (nothing else needed)
 
@@ -139,7 +140,8 @@ These are set in each service's own dashboard, not on our server.
 
 ### Step 7: Search setup (once `NEXT_PUBLIC_NOINDEX=false`)
 
-1. Google Search Console → Add property → **Domain** → `himlifeschool.com`.
+1. https://search.google.com/search-console → Add property → **Domain** → `himlifeschool.com`
+   (signed in with the Google account that should own it).
 2. It gives a `TXT` record. Add it in GoDaddy DNS as `TXT @ google-site-verification=…`
    (alongside the existing records; delete nothing). Click Verify.
 3. Sitemaps → submit `https://himlifeschool.com/sitemap.xml`.
