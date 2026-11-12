@@ -118,7 +118,17 @@ export default function StoryFilter() {
 
         // The chips: stacked down the left on wide screens, from the frame's
         // left edge (where the captions start), scattered across the top on narrow.
-        const frameLeft = rel(captions.current.getBoundingClientRect()).l;
+        const capBox = rel(captions.current.getBoundingClientRect());
+        const frameLeft = capBox.l;
+        // Narrow: a two-line caption reaches into the chips' band on most
+        // phones, so the whole scatter moves down to clear the tallest one,
+        // never closer than 40px to the slit.
+        let drop = 0;
+        if (!wide) {
+          const tops = chips.map((c, i) => SPOTS_NARROW[i][1] * h - c.offsetHeight / 2);
+          const bottoms = chips.map((c, i) => SPOTS_NARROW[i][1] * h + c.offsetHeight / 2);
+          drop = Math.max(0, Math.min(capBox.b + 12 - Math.min(...tops), s.t - 40 - Math.max(...bottoms)));
+        }
         chips.forEach((c, i) => {
           const cw = c.offsetWidth;
           const ch = c.offsetHeight;
@@ -128,7 +138,7 @@ export default function StoryFilter() {
           } else {
             const x = Math.min(w - 8 - cw, Math.max(8, SPOTS_NARROW[i][0] * w - cw / 2));
             c.style.left = `${x}px`;
-            c.style.top = `${SPOTS_NARROW[i][1] * h - ch / 2}px`;
+            c.style.top = `${SPOTS_NARROW[i][1] * h - ch / 2 + drop}px`;
           }
         });
         const starts = chips.map((c) => {
