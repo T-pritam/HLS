@@ -56,7 +56,7 @@ export default function StoryBlueprint() {
           <div className="mt-8 space-y-7 border-t border-hls-black/15 pt-7">
             {PARTS.map((p, i) => (
               <div key={p.head}>
-                <h4 className="flex items-baseline gap-3 font-body text-[16px] font-semibold leading-[1.3] md:text-[17px]">
+                <h4 className="flex items-baseline gap-3 font-body text-[clamp(16px,calc(15.046px+0.254vw),17px)] font-semibold leading-[1.3]">
                   <span className="font-mono text-[11px] font-medium tracking-[0.12em] text-hls-deep">
                     {String(i + 1).padStart(2, '0')}
                   </span>

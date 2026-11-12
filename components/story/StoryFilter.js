@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { initGsap, onResize, reducedMotion, refreshSoon } from '@/lib/motion';
+import { initGsap, onResize, pinLength, reducedMotion, refreshSoon } from '@/lib/motion';
 import SignalStrands from './SignalStrands';
 import StoryCta from './StoryCta';
 
@@ -24,6 +24,8 @@ const PRIORITY = 5;
 const RUN = 350;
 const REST = 40;
 const CLEAR = 8;
+/** Phones scroll the same sequence over 60% of the length. */
+const PHONE = 0.6;
 
 /** Wide: each chip's left edge (px at 1440 wide, scaled), stacked top to bottom. */
 const STAGGER = [0, 50, 15, 70, 30];
@@ -72,6 +74,7 @@ export default function StoryFilter() {
   const strands = useRef(null);
   const strandsWrap = useRef(null);
   const cta = useRef(null);
+  const ctaBand = useRef(null);
 
   useEffect(() => {
     const gsap = initGsap();
@@ -112,13 +115,26 @@ export default function StoryFilter() {
           left: hb.l + BRAIN.left * size,
           top: hb.t + BRAIN.top * size,
         };
-        slit.current.style.top = wide ? `${brain.y}px` : '';
+        // Narrow: the slit sits just above the brain, not mid-screen, so the
+        // strands run into it and the one line out of it lands in the brain.
+        const gap = Math.round(Math.min(72, Math.max(40, h * 0.07)));
+        slit.current.style.top = `${wide ? brain.y : brain.top - gap}px`;
         slit.current.style.left = wide ? '' : `${brain.x}px`;
         const s = rel(slit.current.getBoundingClientRect());
 
         // The chips: stacked down the left on wide screens, from the frame's
         // left edge (where the captions start), scattered across the top on narrow.
-        const frameLeft = rel(captions.current.getBoundingClientRect()).l;
+        const capBox = rel(captions.current.getBoundingClientRect());
+        const frameLeft = capBox.l;
+        // Narrow: a two-line caption reaches into the chips' band on most
+        // phones, so the whole scatter moves down to clear the tallest one,
+        // never closer than 40px to the slit.
+        let drop = 0;
+        if (!wide) {
+          const tops = chips.map((c, i) => SPOTS_NARROW[i][1] * h - c.offsetHeight / 2);
+          const bottoms = chips.map((c, i) => SPOTS_NARROW[i][1] * h + c.offsetHeight / 2);
+          drop = Math.max(0, Math.min(capBox.b + 12 - Math.min(...tops), s.t - 40 - Math.max(...bottoms)));
+        }
         chips.forEach((c, i) => {
           const cw = c.offsetWidth;
           const ch = c.offsetHeight;
@@ -128,7 +144,7 @@ export default function StoryFilter() {
           } else {
             const x = Math.min(w - 8 - cw, Math.max(8, SPOTS_NARROW[i][0] * w - cw / 2));
             c.style.left = `${x}px`;
-            c.style.top = `${SPOTS_NARROW[i][1] * h - ch / 2}px`;
+            c.style.top = `${SPOTS_NARROW[i][1] * h - ch / 2 + drop}px`;
           }
         });
         const starts = chips.map((c) => {
@@ -149,9 +165,16 @@ export default function StoryFilter() {
           scale: wide ? Math.min(1, h / 900) : 0.45,
         });
 
+        // Narrow: the button takes the space between the caption and the head.
+        ctaBand.current.style.top = wide ? '' : `${capBox.b + 12}px`;
+        ctaBand.current.style.bottom = wide ? '' : `${h - (brain.top - 8)}px`;
+
         gsap.set(caps.slice(1), { autoAlpha: 0, y: 16 });
         gsap.set(chips, { autoAlpha: 0, y: 12 });
         gsap.set([slit.current, glow, dimmer, calm], { opacity: 0 });
+        // Narrow: the filter is there, faint, from the start, so the guesses
+        // visibly run into it and stop until it lights.
+        if (!wide) gsap.set(slit.current, { opacity: 0.3 });
 
         // The sequence runs 0 to 10; the rest and the clear add on at the same rate.
         const unit = 10 / RUN;
@@ -169,7 +192,7 @@ export default function StoryFilter() {
           scrollTrigger: {
             trigger: st,
             start: 'top top',
-            end: `+=${RUN + REST + CLEAR}%`,
+            end: pinLength(RUN + REST + CLEAR, Math.round((RUN + REST + CLEAR) * PHONE)),
             pin: true,
             scrub: 0.5,
             anticipatePin: 1,
@@ -308,7 +331,7 @@ export default function StoryFilter() {
         </div>
 
         {/* The one way forward: the middle of the stage, where the chips were. */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 right-0 z-10 flex items-center justify-center px-5 lg:right-[38%]">
+        <div ref={ctaBand} className="pointer-events-none absolute inset-y-0 left-0 right-0 z-10 flex items-center justify-center px-5 lg:right-[38%]">
           <div ref={cta} className="pointer-events-auto invisible opacity-0 motion-reduce:visible motion-reduce:opacity-100">
             <StoryCta primary onClick={() => track('story_cta_clicked')} />
           </div>

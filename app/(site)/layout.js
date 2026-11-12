@@ -4,6 +4,7 @@ import SmoothScroll from '@/components/SmoothScroll';
 import Preloader from '@/components/Preloader';
 import Cursor from '@/components/Cursor';
 import Nav from '@/components/Nav';
+import { SITE_URL, SITE_NAME, robotsMeta, verification, organizationJsonLd } from '@/lib/seo';
 
 const fraunces = Fraunces({
   subsets: ['latin'],
@@ -29,18 +30,27 @@ const plexMono = IBM_Plex_Mono({
 export const metadata = {
   title: 'At Your Own Desk · HIM LIFE SCHOOL',
   description: "For CA Final Group 1 repeaters. You worked. You still don't know why.",
-  metadataBase: new URL('https://himlifeschool.com'),
+  metadataBase: new URL(SITE_URL),
+  alternates: { canonical: '/' },
   openGraph: {
     title: 'At Your Own Desk · HIM LIFE SCHOOL',
     description: "For CA Final Group 1 repeaters. You worked. You still don't know why.",
     type: 'website',
+    url: '/',
+    siteName: SITE_NAME,
+    locale: 'en_IN',
   },
-  // Kept out of search until launch. Set NEXT_PUBLIC_NOINDEX to "true" on previews.
-  ...(process.env.NEXT_PUBLIC_NOINDEX === 'true' ? { robots: { index: false, follow: false } } : {}),
+  twitter: { card: 'summary_large_image' },
+  // Open to search engines unless NEXT_PUBLIC_NOINDEX="true" (previews).
+  robots: robotsMeta,
+  verification,
 };
 
 export const viewport = {
   themeColor: '#000000',
+  // The page is already dark. Without this, Android's forced dark mode
+  // inverts the platinum pills and paper into dark grey.
+  colorScheme: 'dark',
   width: 'device-width',
   initialScale: 1,
 };
@@ -52,6 +62,10 @@ export default function RootLayout({ children }) {
       className={`${fraunces.variable} ${hanken.variable} ${plexMono.variable}`}
     >
       <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
         {/* Runs before first paint. Browser scroll restoration would drop the
             visitor into the middle of a pinned timeline on reload. */}
         <script

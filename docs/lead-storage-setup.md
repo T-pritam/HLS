@@ -1,3 +1,6 @@
+> **Note (Nov 2026):** the site now runs on our VPS with a local Redis (see `docs/vps-deploy.md`),
+> and the consultation is free with Calendly booking (no Razorpay). The Vercel steps below are kept for reference.
+
 # Fast lead storage: Redis for bookings, Google Sheets as the team's copy
 
 ## Why
@@ -17,17 +20,10 @@ Measured locally, with Google's delay simulated at 1.2 seconds per call:
 | --- | --- | --- |
 | Submit details → times shown | 3.6 s | 0.03 s |
 | Pick a time | 2.4 s | 0.01 s |
-| Pay → checkout starts opening | 3.6 s | 0.01 s (the order is made in the background when a time is held; Razorpay's window then takes about 1 s) |
 | Paid → booking confirmed | 8.5 s | 0.03 s |
 
 On Vercel, add roughly 0.2 to 0.6 s per step for the network and cold starts,
 less with the region settings below.
-
-What Razorpay does is unchanged. After a payment its own screens ("Confirming
-Payment", then "Payment Successful, redirecting in 5 seconds") take about 10
-seconds in test mode. Meanwhile `/sip` now says "Finish paying in the Razorpay
-window", then "Payment received. Confirming your booking…", instead of showing
-the Pay button again.
 
 ## 1. Create the Redis database (about 5 minutes, free)
 
@@ -49,7 +45,7 @@ BOOK_SHEETS_URL=<your Apps Script /exec URL, as now>
 BOOK_SHEETS_SECRET=<your secret, as now>
 ```
 
-Keep everything else as it is (Razorpay keys, `BOOK_TOKEN_SECRET`,
+Keep everything else as it is (`BOOK_TOKEN_SECRET`,
 `BOOK_ADMIN_TOKEN`, support contacts).
 
 ## 3. Run the site's functions in India
@@ -58,7 +54,7 @@ Keep everything else as it is (Razorpay keys, `BOOK_TOKEN_SECRET`,
 
 Vercel's default region is in the USA, so every click from India crossed the
 world and back, more than once per step. Mumbai also puts the site next to
-Razorpay and the Redis database.
+the Redis database.
 
 ## 4. Update the Apps Script
 
@@ -75,14 +71,14 @@ Redeploy on Vercel, then make one test booking:
 
 - each step should respond in well under a second;
 - a row appears in **Leads** a few seconds later;
-- Payment status and Status update in the sheet after paying.
+- Status and Slot (IST) update in the sheet after booking a time in Calendly.
 
 ## Working with the sheet now
 
 - The sheet is the team's view. Staff may fill in **Owner** and **Staff notes**;
   the site never overwrites them.
 - A **Status** you set after booking (Attended, Blueprint delivered, In
-  counselling, Enrolled, Closed) is kept, unless the lead is later refunded.
+  counselling, Enrolled, Closed) is kept.
 - If Google was down for a while, `POST /api/book/admin/sync-sheet` (with
   `Authorization: Bearer <BOOK_ADMIN_TOKEN>`) copies every lead to the sheet again.
 

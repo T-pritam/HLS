@@ -5,7 +5,6 @@ import Todo from './Todo';
 const LINKS = [
   { href: '/sip/privacy', label: 'Privacy Notice' },
   { href: '/sip/terms', label: 'Terms of Use' },
-  { href: '/sip/refund', label: 'Refund and Cancellation' },
   { href: '/sip/contact', label: 'Contact' },
 ];
 
@@ -36,7 +35,7 @@ export default function Footer({ cfg }) {
             <ul className="flex flex-wrap gap-x-6 gap-y-1 text-[15px]">
               {LINKS.map((l) => (
                 <li key={l.href}>
-                  <a href={l.href} className="inline-block py-2 text-hls-platinum no-underline hover:text-white hover:underline">
+                  <a href={l.href} className="inline-flex min-h-11 items-center text-hls-platinum no-underline hover:text-white hover:underline">
                     {l.label}
                   </a>
                 </li>
@@ -53,7 +52,7 @@ export default function Footer({ cfg }) {
         )}
 
         <p className="mt-8 border-t border-white/10 pt-6 text-[13px] text-hls-mist">
-          Payments are processed securely by Razorpay. You share your papers through a private link after booking.
+          Times are booked through Calendly. You share your papers through a private link after booking.
         </p>
       </div>
     </footer>

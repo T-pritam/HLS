@@ -1,7 +1,7 @@
 import Todo from './Todo';
 import BookPhoto from './BookPhoto';
+import Offer from './Offer';
 import { hasContact } from './Contact';
-import { Inr } from './format';
 import { approvedTestimonials, mentor, mentorReady } from '@/lib/book/content';
 
 /* ------------------------------------------------------------------ */
@@ -107,7 +107,7 @@ export function WhoFor({ cfg }) {
           {SIGNS.map((s) => (
             <li key={s} className="flex items-start gap-4 py-5">
               <Check />
-              <span className="text-[17px] md:text-[18px]">{s}</span>
+              <span className="text-[clamp(17px,calc(16.046px+0.254vw),18px)]">{s}</span>
             </li>
           ))}
         </ul>
@@ -319,7 +319,7 @@ export function Example({ cfg }) {
               <p className="label text-hls-signal-dark">
                 {String(i + 1).padStart(2, '0')} · {k}
               </p>
-              <p className="mt-2 text-[17px] md:text-[18px]">{v}</p>
+              <p className="mt-2 text-[clamp(17px,calc(16.046px+0.254vw),18px)]">{v}</p>
             </li>
           ))}
         </ol>
@@ -337,7 +337,7 @@ export function Example({ cfg }) {
 /* ------------------------------------------------------------------ */
 
 const STEPS = [
-  ['Book and pay', 'Confirm you are a Group 1 repeater, choose a slot and pay for the consultation.'],
+  ['Book your slot', 'Confirm you are a Group 1 repeater, give your details and choose a time.'],
   ['Share your papers privately', 'You receive a private link for your marksheets and mock papers.'],
   ['The consultation', 'A one-to-one conversation about your attempt.'],
   ['Your blueprint', 'Where you stand, the gaps, your priorities and a realistic next-step plan, in writing.'],
@@ -352,7 +352,7 @@ export function NextSteps() {
         <div>
           <SectionHead kicker="How it works" id="next-title" title="From booking to blueprint." />
           <p className="mt-6 max-w-md font-medium">
-            The consultation is bought on its own. Booking it does not enrol you in anything.
+            The consultation stands on its own. Booking it does not enrol you in anything.
           </p>
         </div>
         <ol className="steps">
@@ -395,7 +395,7 @@ export function Programme() {
           </p>
         </div>
         <div className="rounded-lg border border-white/15 bg-white/[0.04] p-6 md:p-8">
-          <p className="label text-[#8ec3ef]">Online · four components</p>
+          <p className="label text-[#8ec3ef]">Four components</p>
           <ul className="mt-5 space-y-4">
             {COMPONENTS.map(([name, note]) => (
               <li key={name} className="flex items-start gap-3">
@@ -478,7 +478,7 @@ export function Proof() {
         <ul className="mt-10 grid gap-5 md:grid-cols-2">
           {items.map((t) => (
             <li key={t.quote} className="card flex flex-col p-6 md:p-8">
-              <blockquote className="font-display text-[20px] leading-snug md:text-[22px]">&ldquo;{t.quote}&rdquo;</blockquote>
+              <blockquote className="font-display text-[clamp(20px,calc(18.092px+0.509vw),22px)] leading-snug">&ldquo;{t.quote}&rdquo;</blockquote>
               <p className="mt-5 border-t border-hls-line pt-4 text-[15px] text-hls-muted md:mt-auto">
                 <span className="font-medium text-hls-ink">{t.name}</span>
                 {t.detail ? `, ${t.detail}` : ''}
@@ -516,22 +516,17 @@ export function Pricing({ cfg }) {
         <div className="lg:sticky lg:top-28">
           <SectionHead kicker="Price" id="pricing-title" title="Start with a clear diagnosis." />
           <p className="lede mt-6">
-            One payment for the consultation and your written blueprint. Nothing else is sold on this page.
+            Your introductory consultation and written blueprint are complimentary for a limited period. Nothing
+            is sold on this page.
           </p>
         </div>
         <div className="card p-6 shadow-[0_24px_48px_-32px_rgba(16,32,48,0.35)] sm:p-8 md:p-10">
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div>
-              <h3 className="text-[24px] leading-tight md:text-[28px]">The Blueprint Consultation</h3>
+              <h3 className="text-[clamp(24px,calc(20.183px+1.018vw),28px)] leading-tight">The Blueprint Consultation</h3>
               <p className="mt-1 text-[15px] text-hls-muted">For CA Final Group 1 repeaters</p>
             </div>
-            <div className="sm:text-right">
-              <p className="font-display text-[30px] leading-none md:text-[36px]">
-                <Inr amount={cfg.priceInr} />
-              </p>
-              <p className="mt-2 text-[15px] text-hls-muted">{cfg.taxLabel}</p>
-              <p className="text-[15px] text-hls-muted">One-time payment</p>
-            </div>
+            <Offer cfg={cfg} align="end" />
           </div>
           <CheckList items={INCLUDED} className="mt-8 space-y-3 border-t border-hls-line pt-8" />
           {facts.length > 0 && (
@@ -571,30 +566,12 @@ export function Pricing({ cfg }) {
 /* 12. FAQ                                                             */
 /* ------------------------------------------------------------------ */
 
-function refundAnswer(cfg) {
-  if (!cfg.policyPublished) {
-    return (
-      <>
-        <p>Cancellation, reschedule and refund terms are to be confirmed.</p>
-        {hasContact(cfg) && <p className="mt-2">If you have a question before booking, please contact support.</p>}
-      </>
-    );
-  }
+function attendAnswer() {
   return (
-    <>
-      <p>
-        If you cancel at least 24 hours before your slot, you get a full refund. Inside 24 hours there is no
-        automatic refund. You can reschedule once, free, with at least 24 hours&rsquo; notice. If we have to cancel,
-        you can choose a new slot or a full refund. A missed consultation is not refunded automatically, but
-        support reviews exceptions.
-      </p>
-      <p className="mt-2">
-        {cfg.refundProcessingTime
-          ? `Refunds are processed within ${cfg.refundProcessingTime}.`
-          : 'Refund processing time is to be confirmed.'}{' '}
-        <a href="/sip/refund">Read the refund and cancellation policy</a>.
-      </p>
-    </>
+    <p>
+      Use the reschedule or cancel link in your Calendly confirmation email, so the time can go to another student.
+      The consultation is complimentary, so there is nothing to refund.
+    </p>
   );
 }
 
@@ -615,12 +592,11 @@ export function faqItems(cfg) {
       </p>,
     ],
     [
-      'Is it online?',
+      'How is the consultation held?',
       <p key="a">
-        The Score Improvement Programme is online.{' '}
         {cfg.consultationMode
           ? `The consultation is held as follows: ${cfg.consultationMode}.`
-          : 'How the consultation is held is to be confirmed.'}
+          : 'The details are in the confirmation email you receive when you book your time.'}
       </p>,
     ],
     [
@@ -650,7 +626,7 @@ export function faqItems(cfg) {
         {length} {blueprint}
       </p>,
     ],
-    ['What if I can’t attend or want a refund?', <div key="a">{refundAnswer(cfg)}</div>],
+    ['What if I can’t attend?', <div key="a">{attendAnswer()}</div>],
     [
       'What does the programme cost?',
       <p key="a">A counsellor shares the cost on a call, if the programme fits you after your consultation.</p>,
@@ -672,7 +648,7 @@ export function Faq({ cfg }) {
         <div className="mt-10 border-t border-hls-line">
           {faqItems(cfg).map(([q, a]) => (
             <details key={q} className="group border-b border-hls-line">
-              <summary className="flex min-h-[56px] cursor-pointer items-center justify-between gap-6 py-5 text-[17px] font-semibold transition-colors hover:text-hls-signal-dark md:text-[18px]">
+              <summary className="flex min-h-[56px] cursor-pointer items-center justify-between gap-6 py-5 text-[clamp(17px,calc(16.046px+0.254vw),18px)] font-semibold transition-colors hover:text-hls-signal-dark">
                 {q}
                 <span className="faq-sign transition-transform">
                   <Icon name="chevron" />

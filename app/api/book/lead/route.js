@@ -6,7 +6,7 @@ import { log } from '@/lib/book/log';
 
 export const runtime = 'nodejs';
 
-/** Saves the lead before any payment, so drop-offs can be followed up. */
+/** Saves the lead before the student picks a time, so drop-offs can be followed up. */
 export async function POST(request) {
   if (rateLimited(request, 'lead', { limit: 8, windowMs: 10 * 60 * 1000 })) {
     return json({ error: 'Too many attempts. Please wait a few minutes and try again.' }, 429);

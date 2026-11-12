@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import Image from 'next/image';
 import PillLink from '@/components/ui/PillLink';
 import { LANDING_URL } from '@/lib/motion';
-import { CTA_LABEL } from '@/lib/story-facts';
+import { NAV_CTA_LABEL } from '@/lib/story-facts';
 
 /** The crest and one way forward. Nothing else. */
 export default function Nav() {
@@ -62,11 +62,15 @@ export default function Nav() {
       style={{ transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)' }}
     >
       <nav className="mx-auto flex h-[72px] w-full max-w-[1600px] items-center justify-between gap-4 px-5 md:h-[84px] md:px-10">
+        {/* A plain link on purpose: from the 404 page a full load brings the
+            preloader and smooth scroll back with the story. */}
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
         <a
           href="/"
           onClick={toTop}
           aria-label="HIM LIFE SCHOOL, home"
-          className="flex shrink-0 items-center"
+          // At least 44px to tap; the crest keeps its size and place.
+          className="flex min-h-11 min-w-11 shrink-0 items-center"
         >
           {/* 40px tall on phones, up to 60px on desktop; the bar's height is
               unchanged, so --nav-h stays as it is. */}
@@ -82,7 +86,7 @@ export default function Nav() {
 
         {/* Navy over a light panel, Platinum everywhere else. */}
         <PillLink href={LANDING_URL} size="md" tone={light ? 'light' : 'dark'}>
-          {CTA_LABEL}
+          {NAV_CTA_LABEL}
         </PillLink>
       </nav>
     </header>

@@ -2,12 +2,12 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ATTEMPTS } from '@/lib/book/attempts';
-import { Inr, telHref, whatsappHref } from './format';
+import { telHref, whatsappHref } from './format';
 
 /**
- * Booking flow: eligibility -> details (lead saved) -> slot (held) -> payment.
- * The browser never decides that a payment succeeded: after checkout it goes
- * to the confirmation page, which waits for the server's record.
+ * Booking flow: eligibility -> details (lead saved) -> a time in the Calendly
+ * calendar on the page. The consultation is free. When Calendly reports the
+ * booking, the lead is marked booked; Calendly sends the confirmation email.
  */
 
 const SESSION_KEY = 'hls-book-lead';
@@ -65,29 +65,24 @@ async function api(path, { method = 'POST', body, fault } = {}) {
   return { ok: res.ok, status: res.status, data };
 }
 
-const timeFmt = (iso) =>
-  new Intl.DateTimeFormat('en-IN', { timeZone: 'Asia/Kolkata', hour: 'numeric', minute: '2-digit', hour12: true })
-    .format(new Date(iso))
-    .toUpperCase();
+let calendlyScript = null;
 
-let razorpayScript = null;
-
-/** Loads Razorpay Checkout once. Called early (on the time step) so Pay opens at once. */
-function loadRazorpay() {
-  if (window.Razorpay) return Promise.resolve(true);
-  if (razorpayScript) return razorpayScript;
-  razorpayScript = new Promise((resolve) => {
+/** Loads Calendly's embed script once. Started on the details step so the calendar opens at once. */
+function loadCalendly() {
+  if (window.Calendly) return Promise.resolve(true);
+  if (calendlyScript) return calendlyScript;
+  calendlyScript = new Promise((resolve) => {
     const s = document.createElement('script');
-    s.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    s.src = 'https://assets.calendly.com/assets/external/widget.js';
     s.async = true;
     s.onload = () => resolve(true);
     s.onerror = () => {
-      razorpayScript = null;
+      calendlyScript = null;
       resolve(false);
     };
     document.body.appendChild(s);
   });
-  return razorpayScript;
+  return calendlyScript;
 }
 
 /* ------------------------------------------------------------------ */
@@ -156,7 +151,7 @@ function Field({ id, label, hint, error, children }) {
 
 function StepTitle({ n, children, titleRef }) {
   return (
-    <h3 ref={titleRef} tabIndex={-1} className="text-[26px] leading-tight outline-none md:text-[30px]">
+    <h3 ref={titleRef} tabIndex={-1} className="text-[clamp(26px,calc(22.183px+1.018vw),30px)] leading-tight outline-none">
       {n && <span className="label mb-2 block text-hls-signal-dark">Step {n} of 3</span>}
       {children}
     </h3>
@@ -165,7 +160,7 @@ function StepTitle({ n, children, titleRef }) {
 
 /* ------------------------------------------------------------------ */
 
-export default function Booking({ variant, priceInr, taxLabel, paymentMode, slotsSynthetic, holdMinutes, contact }) {
+export default function Booking({ variant, calendlyUrl, contact }) {
   const [step, setStep] = useState('eligibility');
   const [lead, setLead] = useState(null); // { leadId, token }
   const [status, setStatus] = useState(null);
@@ -181,36 +176,19 @@ export default function Booking({ variant, priceInr, taxLabel, paymentMode, slot
   const [errors, setErrors] = useState({});
   const [notice, setNotice] = useState(null);
   const [busy, setBusy] = useState(false);
-  const [slots, setSlots] = useState(null);
-  const [mockOpen, setMockOpen] = useState(false);
-  // 'open' while Razorpay's window is up, 'received' once it reports success.
-  const [checkout, setCheckout] = useState(null);
+  // null while loading, true once Calendly's calendar is up, false if it could not load.
+  const [calendarReady, setCalendarReady] = useState(null);
   const requestId = useRef(null);
   const source = useRef({});
   const fault = useRef(null);
   const titleRef = useRef(null);
-  const payLock = useRef(false);
-  // The order is created in the background as soon as a time is held.
-  const prefetched = useRef(null);
-  const mockDialog = useRef(null);
+  const calendarRef = useRef(null);
+  // Name and email for Calendly's form, also after a refresh.
+  const prefill = useRef({ name: '', email: '' });
 
   const go = useCallback((next) => {
     setStep(next);
     requestAnimationFrame(() => titleRef.current?.focus());
-  }, []);
-
-  const confirmationUrl = useCallback(
-    (l) => `/sip/confirmation?lead=${encodeURIComponent(l.leadId)}&t=${encodeURIComponent(l.token)}`,
-    [],
-  );
-
-  const loadSlots = useCallback(async (l) => {
-    setSlots(null);
-    const q = l ? `?leadId=${encodeURIComponent(l.leadId)}&token=${encodeURIComponent(l.token)}` : '';
-    const res = await fetch(`/api/book/slots${q}`).catch(() => null);
-    const data = res?.ok ? await res.json() : null;
-    setSlots(data?.slots ?? []);
-    if (!data) setNotice({ kind: 'error', text: 'We could not load the available times.', fallback: true });
   }, []);
 
   // Restore an in-progress booking after a refresh; capture UTMs once.
@@ -226,17 +204,12 @@ export default function Booking({ variant, priceInr, taxLabel, paymentMode, slot
         { method: 'GET' },
       );
       if (!res.ok) return writeSession(null);
-      const s = res.data.status;
+      prefill.current = { name: saved.name ?? '', email: saved.email ?? '' };
       setLead(saved);
-      setStatus(s);
-      if (s.status !== 'New' || s.paymentStatus === 'captured') {
-        window.location.assign(confirmationUrl(saved));
-        return;
-      }
-      setStep('slot');
-      loadSlots(saved);
+      setStatus(res.data.status);
+      setStep(res.data.status?.slotBooked ? 'booked' : 'calendar');
     })();
-  }, [confirmationUrl, loadSlots]);
+  }, []);
 
   // Variant C's attempt question pre-selects the attempt.
   useEffect(() => {
@@ -244,6 +217,57 @@ export default function Booking({ variant, priceInr, taxLabel, paymentMode, slot
     window.addEventListener('hls:attempt', onAttempt);
     return () => window.removeEventListener('hls:attempt', onAttempt);
   }, []);
+
+  // Fetch Calendly's script while the student fills in their details.
+  useEffect(() => {
+    if (calendlyUrl && (step === 'details' || step === 'calendar')) loadCalendly();
+  }, [step, calendlyUrl]);
+
+  // Show the calendar, with the name and email already filled in.
+  useEffect(() => {
+    if (step !== 'calendar' || !calendlyUrl || !lead) return;
+    let cancelled = false;
+    setCalendarReady(null);
+    loadCalendly().then((ok) => {
+      const el = calendarRef.current;
+      if (cancelled || !el) return;
+      if (!ok || !window.Calendly) {
+        setCalendarReady(false);
+        return;
+      }
+      el.innerHTML = '';
+      const s = source.current;
+      // Only the campaign values that are set; Calendly would send the rest as "undefined".
+      const utm = Object.fromEntries(
+        ['utmSource', 'utmMedium', 'utmCampaign', 'utmContent'].filter((k) => s[k]).map((k) => [k, s[k]]),
+      );
+      // Calendly sends the prefill to its frame by message, not in the address.
+      const url = new URL(calendlyUrl);
+      url.searchParams.set('hide_gdpr_banner', '1'); // its cookie banner covers half the calendar on a phone
+      window.Calendly.initInlineWidget({ url: url.toString(), parentElement: el, prefill: prefill.current, utm });
+      setCalendarReady(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [step, calendlyUrl, lead]);
+
+  // Calendly tells the page when a time is booked; the server then marks the lead booked.
+  useEffect(() => {
+    if (step !== 'calendar' || !lead) return;
+    async function onMessage(e) {
+      if (!/^https:\/\/([a-z0-9-]+\.)*calendly\.com$/.test(e.origin)) return;
+      if (e.data?.event !== 'calendly.event_scheduled') return;
+      const eventUri = e.data.payload?.event?.uri;
+      const inviteeUri = e.data.payload?.invitee?.uri;
+      const res = await api('/api/book/scheduled', { body: { ...lead, eventUri, inviteeUri } }).catch(() => null);
+      if (res?.ok) setStatus(res.data.status);
+      writeSession({ ...lead, ...prefill.current, booked: true });
+      go('booked');
+    }
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, [step, lead, go]);
 
   const set = (key) => (e) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
@@ -309,11 +333,11 @@ export default function Booking({ variant, priceInr, taxLabel, paymentMode, slot
         return;
       }
       const l = { leadId: res.data.leadId, token: res.data.token };
+      prefill.current = { name: form.name.trim(), email: form.email.trim() };
       setLead(l);
       setStatus(res.data.status);
-      writeSession(l);
-      go('slot');
-      loadSlots(l);
+      writeSession({ ...l, ...prefill.current });
+      go('calendar');
     } catch {
       setNotice({ kind: 'error', text: 'We could not reach the server. Your details are still here.', fallback: true });
     } finally {
@@ -321,160 +345,6 @@ export default function Booking({ variant, priceInr, taxLabel, paymentMode, slot
     }
   }
 
-  async function chooseSlot(slotId) {
-    if (busy) return;
-    setBusy(true);
-    setNotice(null);
-    try {
-      const res = await api('/api/book/hold', { body: { ...lead, slotId } });
-      if (!res.ok) {
-        setNotice({ kind: 'error', text: res.data.error ?? 'That slot is not available. Please choose another.' });
-        loadSlots(lead);
-        return;
-      }
-      setStatus(res.data.status);
-      if (res.data.status?.paymentRequired !== false) {
-        prefetched.current = api('/api/book/order', { body: lead, fault: fault.current }).catch(() => null);
-      }
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  // Fetch Razorpay's script while the student picks a time.
-  useEffect(() => {
-    if (step === 'slot' && paymentMode !== 'mock') loadRazorpay();
-  }, [step, paymentMode]);
-
-  const held = status?.hold && Date.parse(status.hold.expiresAt) > Date.now() ? status.hold : null;
-
-  async function cancelled(reason, text) {
-    prefetched.current = null;
-    const res = await api('/api/book/hold', { method: 'DELETE', body: { ...lead, reason } });
-    if (res.ok) setStatus(res.data.status);
-    setNotice({ kind: 'info', text });
-    loadSlots(lead);
-  }
-
-  function paid(resp) {
-    // Show it at once, send the signature for the server to check (keepalive
-    // lets it finish while the page changes), and move on. The confirmation
-    // page shows the booking as soon as the server has Razorpay's word for it.
-    setCheckout('received');
-    fetch('/api/book/verify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...lead, ...resp }),
-      keepalive: true,
-    }).catch(() => null);
-    window.location.assign(confirmationUrl(lead));
-  }
-
-  async function pay() {
-    if (payLock.current) return; // double click
-    payLock.current = true;
-    setBusy(true);
-    setNotice(null);
-    try {
-      // Use the order made in the background when the time was held, if the
-      // hold still has a minute left; otherwise ask for it now.
-      const pending = prefetched.current;
-      prefetched.current = null;
-      const fresh = held && Date.parse(held.expiresAt) - Date.now() > 60000;
-      let res = pending && fresh ? await pending : null;
-      if (!res?.ok || !res.data?.order) res = await api('/api/book/order', { body: lead, fault: fault.current });
-      if (res.data.alreadyBooked || res.data.noPayment) {
-        window.location.assign(confirmationUrl(lead));
-        return;
-      }
-      if (!res.ok) {
-        setNotice({ kind: 'error', text: res.data.error ?? 'We could not start the payment.', fallback: res.data.fallback });
-        if (res.data.code === 'hold_expired' || res.data.code === 'slot_taken') loadSlots(lead);
-        return;
-      }
-      setStatus(res.data.status);
-      const order = res.data.order;
-
-      if (order.mode === 'mock') {
-        setMockOpen(true);
-        return;
-      }
-
-      const loaded = await loadRazorpay();
-      if (!loaded) {
-        setNotice({ kind: 'error', text: 'The payment window could not load.', fallback: true });
-        return;
-      }
-      const rzp = new window.Razorpay({
-        key: order.keyId,
-        order_id: order.id,
-        amount: order.amountPaise,
-        currency: order.currency,
-        name: 'HIM LIFE SCHOOL',
-        description: 'Blueprint Consultation',
-        prefill: order.prefill,
-        notes: { leadId: lead.leadId },
-        theme: { color: '#1273c2' },
-        handler: paid,
-        modal: {
-          ondismiss: () => {
-            setCheckout(null);
-            cancelled('cancelled', 'Payment cancelled. Your slot has been released. Choose a time to try again.');
-          },
-          confirm_close: true,
-        },
-      });
-      rzp.on('payment.failed', (r) => {
-        setNotice({
-          kind: 'error',
-          text: `The payment did not go through${r?.error?.description ? `: ${r.error.description.replace(/[.\s]+$/, '')}` : ''}. You can try again in the payment window.`,
-        });
-      });
-      setCheckout('open');
-      rzp.open();
-    } catch {
-      setNotice({ kind: 'error', text: 'We could not start the payment.', fallback: true });
-    } finally {
-      payLock.current = false;
-      setBusy(false);
-    }
-  }
-
-  // Mock checkout dialog (RAZORPAY_MODE=mock only).
-  useEffect(() => {
-    const d = mockDialog.current;
-    if (!d) return;
-    if (mockOpen && !d.open) d.showModal();
-    if (!mockOpen && d.open) d.close();
-  }, [mockOpen]);
-
-  async function mock(outcome) {
-    if (outcome === 'cancel') {
-      setMockOpen(false);
-      cancelled('cancelled', 'Payment cancelled. Your slot has been released. Choose a time to try again.');
-      return;
-    }
-    setBusy(true);
-    const res = await api('/api/book/mock-checkout', { body: { ...lead, outcome } });
-    setBusy(false);
-    if (outcome === 'fail') {
-      setMockOpen(false);
-      setNotice({ kind: 'error', text: 'The payment did not go through (simulated). Your slot has been released.' });
-      loadSlots(lead);
-      setStatus((s) => (s ? { ...s, hold: null } : s));
-      return;
-    }
-    if (res.ok) paid(res.data);
-  }
-
-  /* ---------------------------------------------------------------- */
-
-  const days = [];
-  for (const s of slots ?? []) {
-    const day = days.find((d) => d.day === s.day);
-    if (day) day.slots.push(s);
-    else days.push({ day: s.day, label: s.dayLabel, slots: [s] });
-  }
 
   return (
     <div className="card p-5 sm:p-8">
@@ -519,7 +389,7 @@ export default function Booking({ variant, priceInr, taxLabel, paymentMode, slot
           <StepTitle n={2} titleRef={titleRef}>
             Your details
           </StepTitle>
-          <p className="mt-3 text-hls-muted">We save these before payment so we can help if anything goes wrong.</p>
+          <p className="mt-3 text-hls-muted">We save these first, so we can help if anything goes wrong with the booking.</p>
 
           <div className="mt-6 grid gap-5">
             <Field id="bk-name" label="Full name" error={errors.name}>
@@ -656,127 +526,55 @@ export default function Booking({ variant, priceInr, taxLabel, paymentMode, slot
         </form>
       )}
 
-      {step === 'slot' && (
+      {step === 'calendar' && (
         <div className="mt-2">
           <StepTitle n={3} titleRef={titleRef}>
-            Choose a time and pay
+            Choose a time
           </StepTitle>
-          {slotsSynthetic && (
-            <p className="mt-3 inline-block rounded bg-[#fff7ed] px-2 py-1 font-mono text-[13px] text-[#92400e]">
-              Sample times for testing. Not real availability.
-            </p>
-          )}
-          <p className="mt-3 text-hls-muted">
-            All times are India Standard Time. We hold your chosen time for {holdMinutes} minutes while you pay.
-          </p>
-
-          {slots === null && <p className="mt-6">Loading available times…</p>}
-          {slots && slots.length === 0 && (
-            <p className="mt-6">There are no open times right now. Please check back soon.</p>
-          )}
-
-          <div className="mt-6 space-y-6">
-            {days.map((d) => (
-              <fieldset key={d.day}>
-                <legend className="label text-hls-muted">{d.label}</legend>
-                <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                  {d.slots.map((s) => {
-                    const selected = held?.slotId === s.id;
-                    return (
-                      <button
-                        key={s.id}
-                        type="button"
-                        aria-pressed={selected}
-                        disabled={busy && !selected}
-                        onClick={() => chooseSlot(s.id)}
-                        className={`min-h-[48px] rounded border px-3 py-2 text-[16px] ${
-                          selected
-                            ? 'border-hls-signal bg-hls-signal font-semibold text-white'
-                            : 'border-hls-line bg-white hover:border-hls-steel'
-                        }`}
-                      >
-                        {s.timeLabel.replace(' IST', '')}
-                      </button>
-                    );
-                  })}
-                </div>
-              </fieldset>
-            ))}
-          </div>
-
-          {held && status?.slot && (
-            <div className="mt-8 rounded-md bg-hls-wash p-4" aria-live="polite">
-              <p className="font-medium">
-                {status.slot.dayLabel}, {status.slot.timeLabel}
+          {calendlyUrl ? (
+            <>
+              <p className="mt-3 text-hls-muted">
+                Pick a time that suits you. Your name and email are already filled in. You get a confirmation email
+                from Calendly with a link to reschedule or cancel.
               </p>
-              <p className="text-[15px] text-hls-muted">Held for you until {timeFmt(held.expiresAt)} IST.</p>
+              {calendarReady === false ? (
+                <Notice
+                  notice={{ kind: 'error', text: 'The booking calendar could not load.', fallback: true }}
+                  contact={contact}
+                />
+              ) : (
+                <>
+                  {calendarReady === null && <p className="mt-6">Loading the calendar…</p>}
+                  <div ref={calendarRef} className="mt-6 -mx-2 h-[700px] min-w-[280px] overflow-hidden sm:mx-0" />
+                </>
+              )}
+            </>
+          ) : (
+            <div className="mt-3">
+              <p className="text-hls-muted">
+                Online booking opens soon. We have your details and will contact you to fix a time for your
+                consultation.
+              </p>
+              <FallbackContact contact={contact} />
             </div>
           )}
-
-          <div className="mt-8">
-            {checkout ? (
-              <div className="rounded-md border-l-4 border-hls-signal bg-[#eef5fb] p-4" role="status" aria-live="polite">
-                <p className="font-medium text-hls-navy">
-                  {checkout === 'received'
-                    ? 'Payment received. Confirming your booking…'
-                    : 'Finish paying in the Razorpay window.'}
-                </p>
-                <p className="mt-1 text-[15px] text-hls-muted">
-                  {checkout === 'received'
-                    ? 'This takes a moment. Please keep this page open.'
-                    : 'This page updates by itself when the payment is done. Please don’t pay twice.'}
-                </p>
-              </div>
-            ) : status?.paymentRequired === false ? (
-              <button type="button" className="btn-primary w-full sm:w-auto" disabled={!held || busy} onClick={pay}>
-                Confirm booking
-              </button>
-            ) : (
-              <button type="button" className="btn-primary w-full sm:w-auto" disabled={!held || busy} onClick={pay}>
-                {busy ? 'Please wait…' : (
-                  <>
-                    Pay <Inr amount={priceInr} />
-                  </>
-                )}
-              </button>
-            )}
-            <p className="mt-3 text-[15px] text-hls-muted">
-              <Inr amount={priceInr} />, {taxLabel}. Paid securely through Razorpay.
-              {paymentMode === 'mock' && ' (Test mode: simulated checkout, no real payment.)'}
-            </p>
-          </div>
         </div>
       )}
 
-      {(paymentMode === 'mock' || mockOpen) && (
-        <dialog
-          ref={mockDialog}
-          onCancel={(e) => {
-            e.preventDefault();
-            mock('cancel');
-          }}
-          aria-labelledby="mock-title"
-          className="m-auto w-[min(92vw,420px)] rounded-md border border-hls-line p-6 backdrop:bg-black/40"
-        >
-          <p className="label text-[#92400e]">Test checkout · no real payment</p>
-          <h4 id="mock-title" className="mt-3 font-display text-[24px]">
-            Simulated Razorpay checkout
-          </h4>
-          <p className="mt-2 text-[15px] text-hls-muted">
-            <Inr amount={priceInr} /> for the Blueprint Consultation. RAZORPAY_MODE=mock: nothing is charged.
+      {step === 'booked' && (
+        <div className="mt-2" role="status">
+          <StepTitle titleRef={titleRef}>You&rsquo;re booked</StepTitle>
+          {status?.slot && (
+            <p className="mt-4 font-medium">
+              {status.slot.dayLabel}, {status.slot.timeLabel}
+            </p>
+          )}
+          <p className="mt-3 text-hls-muted">
+            Calendly has emailed your confirmation{status?.email ? ` to ${status.email}` : ''}, with a link to
+            reschedule or cancel. Before your consultation, we will send a private link for your marksheets and mock
+            papers.
           </p>
-          <div className="mt-6 grid gap-3">
-            <button type="button" className="btn-primary" disabled={busy} onClick={() => mock('success')}>
-              Simulate successful payment
-            </button>
-            <button type="button" className="btn-secondary" disabled={busy} onClick={() => mock('fail')}>
-              Simulate failed payment
-            </button>
-            <button type="button" className="btn-secondary" disabled={busy} onClick={() => mock('cancel')}>
-              Close checkout (cancel)
-            </button>
-          </div>
-        </dialog>
+        </div>
       )}
     </div>
   );

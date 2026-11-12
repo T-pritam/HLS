@@ -2,6 +2,7 @@ import Header from './Header';
 import Footer from './Footer';
 import Booking from './Booking';
 import StickyCta from './StickyCta';
+import { OFFER, OFFER_NOTE, WasFee } from './Offer';
 import { HeroAttempt, HeroDiagnosis, HeroSample } from './Hero';
 import {
   Consultation,
@@ -17,13 +18,12 @@ import {
   WhatYouGet,
   WhoFor,
 } from './Sections';
-import { Inr } from './format';
 import { getPublicConfig } from '@/lib/book/config';
 import { approvedSample } from '@/lib/book/content';
 import { VARIANTS } from '@/lib/book/attempts';
 
 /**
- * One template, three openings (?v=a|b|c, default a). The form and payment
+ * One template, three openings (?v=a|b|c, default a). The form and booking
  * are identical behind all of them, and the variant is saved with each lead.
  * B (proof-led) needs an approved sample blueprint; without one it falls back
  * to A, and the lead records the variant actually shown.
@@ -45,7 +45,7 @@ const NAV = [
   { href: '#faqs', label: 'FAQs' },
 ];
 
-const BOOK_STEPS = ['Confirm you are eligible', 'Give your details', 'Choose a time and pay'];
+const BOOK_STEPS = ['Confirm you are eligible', 'Give your details', 'Choose a time'];
 
 export default function BookTemplate({ requested = 'a' }) {
   const sample = approvedSample();
@@ -93,8 +93,12 @@ export default function BookTemplate({ requested = 'a' }) {
               <p className="lede mx-auto mt-5">
                 Find where your marks are breaking, and leave with a written blueprint for what to do next.
               </p>
-              <p className="mt-6 font-display text-[24px] leading-tight md:text-[28px]">
-                <Inr amount={cfg.priceInr} /> <span className="text-hls-muted">· {cfg.taxLabel}</span>
+              <p className="mt-6 font-display text-[clamp(24px,calc(20.183px+1.018vw),28px)] leading-tight">
+                {OFFER}
+              </p>
+              <p className="mt-2 text-[15px] text-hls-muted">
+                <WasFee cfg={cfg} className="mr-2" />
+                {OFFER_NOTE} · One-to-one consultation
               </p>
               <ol className="mt-8 flex flex-col items-center gap-3 text-[15px] sm:flex-row sm:justify-center sm:gap-6">
                 {BOOK_STEPS.map((t, i) => (
@@ -110,11 +114,7 @@ export default function BookTemplate({ requested = 'a' }) {
             <div className="mx-auto mt-12 max-w-2xl">
               <Booking
                 variant={variant}
-                priceInr={cfg.priceInr}
-                taxLabel={cfg.taxLabel}
-                paymentMode={cfg.paymentMode}
-                slotsSynthetic={cfg.slotsSynthetic}
-                holdMinutes={cfg.holdMinutes}
+                calendlyUrl={cfg.calendlyUrl}
                 contact={{ phone: cfg.supportPhone, whatsapp: cfg.supportWhatsApp, email: cfg.supportEmail }}
               />
               <p className="mt-6 flex items-center justify-center gap-2 text-center text-[15px] text-hls-muted">
@@ -126,7 +126,15 @@ export default function BookTemplate({ requested = 'a' }) {
         </section>
       </main>
       <Footer cfg={cfg} />
-      <StickyCta price={<Inr amount={cfg.priceInr} />} note={cfg.taxLabel} />
+      <StickyCta
+        price={OFFER}
+        note={
+          <>
+            <WasFee cfg={cfg} className="mr-1.5" />
+            {OFFER_NOTE}
+          </>
+        }
+      />
     </>
   );
 }

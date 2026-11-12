@@ -1,7 +1,7 @@
 import LegalPage, { DraftBanner, NotPublished } from '@/components/book/LegalPage';
 import { getPublicConfig } from '@/lib/book/config';
 
-export const metadata = { title: 'Privacy Notice' };
+export const metadata = { title: 'Privacy Notice', alternates: { canonical: '/sip/privacy' } };
 
 // Placeholder wording for review. Not legal advice and not approved.
 function Draft({ cfg }) {
@@ -18,10 +18,7 @@ function Draft({ cfg }) {
         <li>Which attempt you are preparing for, and that you are a CA Final Group 1 repeater.</li>
         <li>Your consent choices, with the time you made them.</li>
         <li>How you reached the page (for example, a campaign link), and the page version you saw.</li>
-        <li>
-          Payment references from Razorpay. We do not see or store your card, UPI or bank details; Razorpay
-          handles the payment.
-        </li>
+        <li>The consultation time you book through Calendly.</li>
       </ul>
       <h2>Why we use it</h2>
       <ul>
@@ -39,8 +36,8 @@ function Draft({ cfg }) {
       </p>
       <h2>Who sees it</h2>
       <p>
-        The HLS team members handling your booking, and the service providers we use to run it (Razorpay for
-        payment, and our email provider). We do not sell your details.
+        The HLS team members handling your booking, and the service providers we use to run it (Calendly for
+        booking times, and our email provider). We do not sell your details.
       </p>
       <h2>How long we keep it, and your choices</h2>
       <p>

@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import WordReveal, { toWords } from '@/components/WordReveal';
-import { afterFirstInput, initGsap, reducedMotion } from '@/lib/motion';
+import { afterFirstInput, initGsap, pinLength, reducedMotion } from '@/lib/motion';
 
 const NAME = [toWords('Himakanth Andhavarapu, CA.')];
 
@@ -55,7 +55,7 @@ export default function Teacher({ body = null }) {
           scrollTrigger: {
             trigger: el,
             start: 'top top',
-            end: '+=220%',
+            end: pinLength(220, 130),
             pin: true,
             scrub: 0.6,
             anticipatePin: 1,

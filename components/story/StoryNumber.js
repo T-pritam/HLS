@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { initGsap, reducedMotion } from '@/lib/motion';
+import { initGsap, pinLength, reducedMotion } from '@/lib/motion';
 import { SHOW_STAT, STAT_LABEL, STAT_VALUE } from '@/lib/story-facts';
 
 /** How many of the hundred desks light: the percentage, rounded. */
@@ -67,6 +67,7 @@ export default function StoryNumber() {
   useEffect(() => {
     const gsap = initGsap();
     if (!SHOW_STAT || reducedMotion()) return;
+    const digitsEl = digits.current;
 
     const ctx = gsap.context(() => {
       const lit = [...grid.current.querySelectorAll('[data-lit]')].sort(
@@ -98,7 +99,7 @@ export default function StoryNumber() {
         scrollTrigger: {
           trigger: section.current,
           start: 'top top',
-          end: '+=220%',
+          end: pinLength(220, 130),
           pin: true,
           scrub: 0.5,
           anticipatePin: 1,
@@ -145,7 +146,7 @@ export default function StoryNumber() {
 
     return () => {
       ctx.revert();
-      if (digits.current) digits.current.textContent = String(FIGURE);
+      if (digitsEl) digitsEl.textContent = String(FIGURE);
     };
   }, []);
 
@@ -199,7 +200,7 @@ export default function StoryNumber() {
               <span className="text-[0.55em] text-hls-signal">{UNIT}</span>
             </span>
           </p>
-          <p data-rise className="mt-4 font-mono text-[13px] uppercase leading-[1.6] tracking-[0.12em] text-hls-mist lg:mt-6 lg:text-[14px] lg:tracking-[0.14em]">
+          <p data-rise className="mt-4 font-mono text-[clamp(13px,calc(12.422px+0.154vw),14px)] uppercase leading-[1.6] tracking-[0.12em] text-hls-mist lg:mt-6 lg:tracking-[0.14em]">
             <span className="block">{LABEL_HEAD}</span>
             {LABEL_REST.length ? <span className="block">{LABEL_REST.join(' · ')}</span> : null}
           </p>

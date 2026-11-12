@@ -9,8 +9,8 @@ write to a Google Sheet on its own, so a small Apps Script web app inside the
 sheet receives the writes. This works on Vercel; the default local store does
 not, because Vercel's file system is read-only.
 
-Every form submission becomes a row, and that row updates as the student pays,
-gets booked, or is refunded.
+Every form submission becomes a row, and that row updates when the student
+books a time in Calendly, or when staff move it on.
 
 ## 1. Make the sheet: upload the template (easiest)
 
@@ -90,6 +90,10 @@ Marketing: Email, Marketing: WhatsApp, Marketing: SMS, Status, Payment status,
 Amount (INR), Slot (IST), Slot booked, Order ID, Payment ID, Paid at (IST),
 Refund ID, Needs attention, Owner, Next action, Staff notes, Updated (IST), and
 `record_json` (hidden; the full record the site reads).
+
+Since Nov 2026 the consultation is free and booked through Calendly: Payment status, Amount, Order ID,
+Payment ID, Paid at and Refund ID stay empty; Slot (IST) and Slot booked are filled when a time is
+booked. The script does not need to change.
 
 - **You may edit:** Status (pick from the list), Owner, Next action, Staff notes.
 - **Do not edit:** other columns, `record_json`, or the hidden `_index` and

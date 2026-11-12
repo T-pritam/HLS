@@ -1,9 +1,13 @@
 # /sip (was /book): Blueprint Consultation landing page (v1)
 
-The paid-consultation page for CA Final Group 1 repeaters. It sells one thing,
-the Blueprint Consultation (₹3,000 inclusive of all taxes), and describes the
-Score Improvement Programme without a price. It is `noindex` until launch is
-approved, and payments are Razorpay test mode only.
+The booking page for CA Final Group 1 repeaters. It offers one thing, the
+Blueprint Consultation, **free**, and describes the Score Improvement Programme
+without a price. It is `noindex` until launch is approved.
+
+Flow: eligible? → details (saved as a lead, copied to the Google Sheet) → a time
+in the Calendly calendar embedded on the page. Calendly holds the calendar,
+emails the confirmation and handles reschedules and cancellations. There is no
+payment (Razorpay was removed in Nov 2026).
 
 ## Layout
 
@@ -15,9 +19,9 @@ The app now has two root layouts, so `/sip` inherits nothing from the teaser
 | `app/(site)/` | The teaser, moved unchanged (`layout.js`, `page.js`, `globals.css`) |
 | `app/(book)/` | `/sip` root layout (light theme, same fonts and tokens), pages and legal drafts |
 | `app/(book)/sip/v/[variant]` | Static pages for `?v=b` and `?v=c` (rewritten in `next.config.mjs`) |
-| `app/api/book/*` | Lead, slots, hold, order, verify, webhook, status, mock checkout, admin |
-| `components/book/` | Page sections, booking widget, confirmation |
-| `lib/book/` | Config, booking service, Razorpay gateway, store and adapters |
+| `app/api/book/*` | Lead, scheduled (Calendly booking), status, health, admin |
+| `components/book/` | Page sections, booking widget |
+| `lib/book/` | Config, booking service, store and adapters |
 | `public/book/` | Optimised logos, crest and share image (`npm run assets:book`) |
 
 ## Configuration
@@ -33,29 +37,27 @@ owners) lives in `lib/book/content.js` and is empty by default. Variant B needs
 an approved sample blueprint; without one it shows variant A and the lead
 records `variant: "a"` and `variantRequested: "b"`.
 
-## Payments
+## Calendly
 
-Testing currently uses Tach's Razorpay test account while HLS's own account is
-under review, so checkout shows Tach's name and logo. When HLS's account is
-approved, replace the keys and webhook secret in `.env.local`, register the
-webhook on that account, and re-run one test payment and one refund. No code
-changes are needed.
-
-- `RAZORPAY_MODE=test` with `rzp_test_` keys. Live keys are refused.
-- `RAZORPAY_MODE=mock` (plus `BOOK_TEST_HOOKS=true`) runs a labelled, simulated
-  checkout with no Razorpay calls. Development only.
-- The amount comes from `CONSULTATION_FEE_INR` on the server. The browser never sends one.
-- Paid state comes only from Razorpay: the signed webhook, or, if a webhook is
-  late, a server-to-server fetch of the order's payments. The checkout callback
-  only has its signature checked.
-- Webhook URL: `/api/book/webhook`. Events: `payment.captured`, `order.paid`,
-  `payment.failed`, `payment.authorized`, `refund.created`, `refund.processed`,
-  `refund.failed`. Duplicates are ignored by `X-Razorpay-Event-Id`.
+- `NEXT_PUBLIC_CALENDLY_URL`: the event's booking link (`https://calendly.com/…`).
+  Unset, step 3 says "booking opens soon" and shows the support contacts; the
+  lead is still saved.
+- The calendar opens with the student's name and email filled in, and passes the
+  page's UTM values to Calendly.
+- When Calendly reports a booking (`calendly.event_scheduled` message), the page
+  calls `POST /api/book/scheduled` with the lead's private token. The lead becomes
+  **Booked**, with Calendly's event and invitee addresses, and the private intake
+  link email is sent once. A reschedule replaces the event; a status set by staff
+  (Attended and later) is never moved back.
+- `CALENDLY_API_TOKEN` (optional, a personal access token): the server then looks
+  up the booked time, so it shows on the lead, on the page and in the sheet's
+  "Slot (IST)" column. Without it the sheet says "Booked on Calendly".
+- Cancellations made in Calendly are not reported back to the site.
 
 ## Storage
 
-`LEAD_STORE=redis` (Upstash) keeps bookings in Redis: each call takes
-milliseconds, and it is safe across serverless instances. Use it on Vercel. With
+`LEAD_STORE=redis` keeps leads in Redis: each call takes milliseconds, and it
+is safe across several server processes. Use it on the server (`docs/vps-deploy.md`). With
 `BOOK_SHEETS_URL` set, every lead is also copied to the Google Sheet in the
 background. Setup: `docs/lead-storage-setup.md`.
 
@@ -76,38 +78,25 @@ With `BOOK_ADMIN_TOKEN` set (send it as `Authorization: Bearer …`):
 
 - `GET /api/book/admin/leads` (all) or `?id=lead_…` (one)
 - `PATCH /api/book/admin/leads` `{ leadId, status, owner, nextAction, note }`.
-  Statuses: New, Booked, Attended, Blueprint delivered, In counselling, Enrolled, Refunded, Closed.
-- `POST /api/book/admin/refund` `{ leadId, reason }`: full refund
+  Statuses: New, Booked, Attended, Blueprint delivered, In counselling, Enrolled, Closed.
 - `POST /api/book/admin/sync-sheet`: copies every lead to the Google Sheet again
   (repair after a Sheets outage).
-- `POST /api/book/admin/reconcile`: asks Razorpay about every open unpaid order
-  and books any that were paid. A backstop for missed webhooks; safe to run on a schedule.
 
 ## Checks
 
 ```
-npm run lint                          # new /book code
+npm run lint                          # /sip code
 npm run build                         # must finish with no warnings
 npx next start -p 3300
-BASE_URL=http://localhost:3300 npm run test:book   # payment and booking cases
+BASE_URL=http://localhost:3300 npm run test:book   # lead and booking cases
 ```
 
-`test:book` needs `BOOK_ADMIN_TOKEN` and `BOOK_TEST_HOOKS=true` in `.env.local`,
-plus mock mode or test keys with the webhook secret. It signs webhooks locally
-the same way Razorpay does. In test mode it creates real Razorpay test orders;
-its refund case only runs in mock mode, because a refund needs a real payment.
-
-Real test payments: in Razorpay's test checkout choose Netbanking, any bank,
-then "Success" or "Failure" on the demo bank page. Razorpay ignores obvious
-dummy mobile numbers such as 9876543210 in prefill, so use another number.
-
-To receive Razorpay's own webhooks locally, run `cloudflared tunnel --url
-http://localhost:3300` and add `<tunnel URL>/api/book/webhook` in the Razorpay
-dashboard (Settings → Webhooks, test mode) with the same secret as
-`RAZORPAY_WEBHOOK_SECRET` and the events listed above.
+`test:book` needs `BOOK_ADMIN_TOKEN`. It does not call Calendly: it sends the same
+booking message the Calendly calendar sends. Run it against a copy whose
+`BOOK_SHEETS_URL` is empty, or its "QA Test Student" leads land in the real sheet.
 
 ## Still needed before launch
 
-- Razorpay delivering its own webhooks (register the URL in the dashboard). Test-mode payments, failures, cancel, refund and reconcile were run for real on 19 Oct 2026.
+- The Calendly link (`NEXT_PUBLIC_CALENDLY_URL`), and optionally `CALENDLY_API_TOKEN`.
 - Real phone checks in the Instagram and WhatsApp in-app browsers.
 - Values for every unset env var, approved legal text, and the PM decisions in the build report.

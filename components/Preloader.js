@@ -27,10 +27,28 @@ export default function Preloader() {
 
     document.documentElement.style.overflow = 'hidden';
 
+    // overflow: hidden stops neither Lenis (it scrolls from wheel events) nor
+    // a touch scroll on iOS, so the page could move under the overlay and open
+    // mid-timeline. Swallow those until the halves part; pinch zoom still works.
+    const block = (e) => {
+      if (e.ctrlKey || (e.touches && e.touches.length > 1)) return;
+      e.preventDefault();
+      e.stopPropagation();
+    };
+    const opts = { capture: true, passive: false };
+    window.addEventListener('wheel', block, opts);
+    window.addEventListener('touchmove', block, opts);
+    const unblock = () => {
+      window.removeEventListener('wheel', block, opts);
+      window.removeEventListener('touchmove', block, opts);
+    };
+
     const tl = gsap.timeline({
       paused: true,
       onComplete: () => {
+        unblock();
         document.documentElement.style.overflow = '';
+        if (window.scrollY > 0) window.scrollTo(0, 0);
         setDone(true);
       },
     });
@@ -66,6 +84,7 @@ export default function Preloader() {
     return () => {
       cancelAnimationFrame(frame);
       tl.kill();
+      unblock();
       document.documentElement.style.overflow = '';
     };
   }, []);

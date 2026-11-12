@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-/** Mobile-only bar with the price and the one primary action. Hidden over the hero, pricing and the booking form. */
+/** Mobile-only bar with the offer and the one primary action. Hidden over the hero, pricing and the booking form. */
 export default function StickyCta({ price, note }) {
   const [show, setShow] = useState(false);
 

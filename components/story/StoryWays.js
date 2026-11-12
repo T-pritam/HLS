@@ -5,7 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import WordReveal, { toWords } from '@/components/WordReveal';
 import MagnetLink from '@/components/ui/MagnetLink';
 import { OUTLINE, OutlineArrow } from '@/components/ui/PillLink';
-import { initGsap, LANDING_URL, onResize, reducedMotion, refreshSoon } from '@/lib/motion';
+import { initGsap, LANDING_URL, onResize, pinLength, reducedMotion, refreshSoon } from '@/lib/motion';
 
 const CONSULTATION = 'THE BLUEPRINT CONSULTATION';
 const PROGRAMME = 'THE SCORE IMPROVEMENT PROGRAMME';
@@ -102,7 +102,7 @@ export default function StoryWays() {
           scrollTrigger: {
             trigger: st,
             start: 'top top',
-            end: '+=250%',
+            end: pinLength(250, 150),
             pin: true,
             scrub: 0.6,
             anticipatePin: 1,
@@ -221,7 +221,7 @@ export default function StoryWays() {
           >
             The Blueprint Consultation
           </h3>
-          <p className="mt-5 max-w-[46ch] font-body text-[16px] leading-[1.6] text-hls-platinum/75 md:text-[17px]">
+          <p className="mt-5 max-w-[46ch] font-body text-[clamp(16px,calc(15.046px+0.254vw),17px)] leading-[1.6] text-hls-platinum/75">
             A one-to-one conversation about your attempt, and a personal score-improvement blueprint
             to take away.
           </p>
@@ -249,10 +249,10 @@ export default function StoryWays() {
           >
             The Score Improvement Programme
           </h3>
-          <p className="mt-5 max-w-[46ch] font-body text-[16px] leading-[1.6] text-hls-platinum/75 md:text-[17px]">
-            Online. For CA Final Group 1 repeaters preparing for May 2027. Financial Reporting,
-            Advanced Financial Management and Audit, with one-to-one attention to how you prepare
-            and perform.
+          <p className="mt-5 max-w-[46ch] font-body text-[clamp(16px,calc(15.046px+0.254vw),17px)] leading-[1.6] text-hls-platinum/75">
+            For CA Final Group 1 repeaters preparing for May 2027. Financial Reporting, Advanced
+            Financial Management and Audit, with one-to-one attention to how you prepare and perform.
+            Built on our five-step framework: mindset, routine, learning, revision and practice.
           </p>
           <p className="mt-6 max-w-[46ch] border-t border-hls-mist/15 pt-5 font-body text-[15px] leading-[1.6] text-hls-mist">
             Discussed with a counsellor after your consultation, if it fits.
