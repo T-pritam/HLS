@@ -526,7 +526,7 @@ export function Pricing({ cfg }) {
               <h3 className="text-[clamp(24px,calc(20.183px+1.018vw),28px)] leading-tight">The Blueprint Consultation</h3>
               <p className="mt-1 text-[15px] text-hls-muted">For CA Final Group 1 repeaters</p>
             </div>
-            <Offer cfg={cfg} align="end" />
+            <Offer align="end" />
           </div>
           <CheckList items={INCLUDED} className="mt-8 space-y-3 border-t border-hls-line pt-8" />
           {facts.length > 0 && (

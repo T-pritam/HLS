@@ -15,7 +15,7 @@ const COVERS = ['Where you stand', 'The specific gaps', 'Your priorities', 'A re
 function PriceLine({ cfg }) {
   return (
     <div className="mt-8">
-      <Offer cfg={cfg} note={`${OFFER_NOTE} · One-to-one consultation`} />
+      <Offer note={`${OFFER_NOTE} · One-to-one consultation`} />
     </div>
   );
 }
