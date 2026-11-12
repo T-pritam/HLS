@@ -1,7 +1,7 @@
 import LegalPage, { DraftBanner, NotPublished } from '@/components/book/LegalPage';
 import { getPublicConfig } from '@/lib/book/config';
 
-export const metadata = { title: 'Terms of Use' };
+export const metadata = { title: 'Terms of Use', alternates: { canonical: '/sip/terms' } };
 
 // Placeholder wording for review. Not legal advice and not approved.
 function Draft() {

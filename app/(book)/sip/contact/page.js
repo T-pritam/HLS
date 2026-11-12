@@ -3,7 +3,7 @@ import Contact, { hasContact } from '@/components/book/Contact';
 import Todo from '@/components/book/Todo';
 import { getPublicConfig } from '@/lib/book/config';
 
-export const metadata = { title: 'Contact' };
+export const metadata = { title: 'Contact', alternates: { canonical: '/sip/contact' } };
 
 export default function ContactPage() {
   const cfg = getPublicConfig();
